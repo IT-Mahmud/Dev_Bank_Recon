@@ -1,0 +1,361 @@
+@import url('https://fonts.googleapis.com/css2?family=Ubuntu:wght@300;400;500;700&display=swap');
+
+body {
+    font-family: 'Ubuntu', 'Segoe UI', sans-serif;
+    background-color: #f1f3f6;
+    color: #374767;
+}
+
+/* Apply Ubuntu font to key elements */
+h1, h2, h3, h4, h5, h6, p, span, div, button, input, select, textarea, label {
+    font-family: 'Ubuntu', 'Segoe UI', sans-serif;
+}
+
+/* Sidebar vertical menu styles */
+.sidebar {
+  width: 220px;
+  font-family: 'Ubuntu', 'Segoe UI', sans-serif;
+  font-size: 15px;
+  background: #fff;
+  border-right: 1px solid #222;
+  padding: 0 0 0 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+.section {
+  margin-bottom: 0;
+}
+.section-title {
+  font-weight: bold;
+  margin-left: 18px;
+  margin-top: 18px;
+  margin-bottom: 6px;
+  font-size: 15px;
+}
+.sidebar-link {
+  padding: 8px 0 8px 32px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #222;
+  transition: background 0.2s;
+  border: none;
+  background: none;
+  text-align: left;
+  outline: none;
+}
+.sidebar-link:hover {
+  background: #f5f5f5;
+}
+hr {
+  border: none;
+  border-top: 1px solid #222;
+  margin: 8px 0;
+}
+
+/* Adjust tab container for sidebar */
+.tab-container-vertical {
+  display: flex;
+  max-width: 1100px;
+  margin: 36px auto;
+}
+.tab-content-vertical {
+  flex: 1;
+  background: #fff;
+  border-radius: 0 6px 6px 0;
+  padding: 24px 32px;
+  min-height: 400px;
+}
+
+/* Remove old vertical tab button styles if present */
+.tab-header-vertical, .tab-btn-vertical {
+  display: none !important;
+}
+
+.tab-container { max-width: 760px; margin: 36px auto; }
+.tab-header { display: flex; gap: 6px; margin-bottom: 24px; }
+.tab-btn {
+    padding: 10px 24px;
+    background: #f4f4f4;
+    border: 1px solid #888;
+    border-radius: 6px 6px 0 0;
+    font-size: 1rem;
+    cursor: pointer;
+    font-weight: bold;
+    outline: none;
+}
+.tab-btn[data-active="1"] {
+    background: #fff;
+    border-bottom: 2px solid #fff;
+    color: #222;
+}
+.tab-pane { display: none; }
+.tab-pane[style*="block"] { display: block; }
+
+.parser-container {
+    background: #f4f4f4;
+    border: 1px solid #ccc;
+    padding: 24px 32px 18px 32px;
+    border-radius: 6px;
+    max-width: 680px;
+    /* margin: 0 auto; */
+    margin-left: 0;
+}
+.parser-form { display: flex; flex-direction: column; gap: 18px; }
+.parser-row { display: flex; align-items: center; gap: 2px; }
+.parser-label { width: 100px; font-size: 14px; }
+.parser-input { width: 490px; padding: 6px 0; border-radius: 4px; border: 1px solid #ccc; font-size: 14px; }
+.parser-row-parse { justify-content: flex-end; }
+.parser-parse-btn {
+    background: #0d6efd;
+    border: 1px solid #0b5ed7;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 6px 12px;
+    color: #fff;
+    transition: background 0.2s, border 0.2s;
+    white-space: nowrap;
+    min-width: 120px;
+}
+.parser-parse-btn:disabled {
+    background: #6c757d;
+    color: #fff;
+    cursor: not-allowed;
+    border-color: #6c757d;
+}
+.parser-parse-btn:hover:not(:disabled) {
+    background: #0b5ed7;
+    border-color: #0a58ca;
+}
+
+.parser-file-btn {
+    background: #0d6efd;
+    border: 1px solid #0b5ed7;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+    padding: 6px 12px;
+    color: #fff;
+    transition: background 0.2s, border 0.2s;
+    white-space: nowrap;
+    min-width: 120px;
+}
+.parser-file-btn:hover {
+    background: #0b5ed7;
+    border-color: #0a58ca;
+}
+
+/* Table font size for reports */
+.parser-container table { font-size: 12px; }
+
+/* Report Table Styles */
+.report-table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+    overflow-y: auto;
+    /* max-width: 1095px; */
+    max-width: 1150px;
+    max-height: 400px;
+    margin-bottom: 18px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    border: 1px solid #e1e6ef;
+    background: #fff;
+}
+.report-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 14px;
+    background: #fff;
+    min-width: 600px;
+}
+.report-table th, .report-table td {
+    border: 1px solid #e1e6ef;
+}
+.report-table th {
+    background: #f8f9fa;
+    color: #374767;
+    font-weight: 700;
+    text-align: left;
+    padding: 8px 12px;
+}
+.report-table td {
+    text-align: left;
+    padding: 8px 12px;
+}
+.report-table tr:nth-child(even) {
+    background: #f6f7fa;
+}
+
+/* Sidebar base */
+.custom-sidebar {
+    background: #15302e;
+    min-width: 250px;
+    max-width: 250px;
+    min-height: 100vh;
+    border-right: 1px solid #d1e0dd;
+}
+.menu-item {
+    color: #fff;
+    background: #15302e;
+    font-weight: 600;
+    border-radius: 6px;
+    padding: 5px 0.5rem;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    transition: background 0.2s, color 0.2s;
+    cursor: pointer;
+    font-size: 10pt;
+}
+.menu-item.active, .menu-item[aria-expanded="true"] {
+    background: #1c4643;
+    color: #fff;
+    border-left: 3px solid #37a000;
+}
+.menu-item:hover, .menu-item[aria-expanded="true"] {
+    background: #2d4a47;
+    color: #fff;
+}
+.menu-item:hover i, .menu-item[aria-expanded="true"] i {
+    color: #fff;
+}
+.menu-item i {
+    font-size: 1em;
+}
+.menu-item[aria-expanded="true"] .bi-chevron-right {
+    transform: rotate(90deg);
+}
+.submenu-list {
+    background: #0d3634;
+    display: flex;
+    flex-direction: column;
+    padding-left: 0;
+}
+.submenu-item {
+    display: block;
+    width: 100%;
+    color: #fff;
+    padding-left: 2.2rem;
+    border-left: none;
+    background: #0d3634;
+    font-weight: 400;
+    margin-top: 2px;
+    margin-bottom: 2px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    transition: background 0.2s, color 0.2s;
+    text-decoration: none;
+    font-size: 10pt;
+}
+.submenu-item:hover {
+    background: #1c4643;
+    color: #37a000;
+}
+.nav-link {
+    cursor: pointer;
+}
+
+.topbar {
+    background: #15302e;
+    border-bottom: 1px solid #e1e6ef;
+    height: 48px;
+    width: 100%;
+    display: flex;
+    align-items: center;
+}
+.topbar-title {
+    color: #fff;
+    font-size: 1.25rem;
+    font-weight: 600;
+    padding-left: 24px;
+    letter-spacing: 0.5px;
+}
+
+.card, .panel {
+    background: #fff;
+    border: 1px solid #e1e6ef;
+    border-radius: 4px;
+    margin-bottom: 20px;
+    box-shadow: 0 0 8px rgba(0,0,0,0.05);
+}
+
+.btn-success {
+    background-color: #37a000;
+    border-color: #318d01;
+    color: #fff;
+}
+.btn-success:hover {
+    background-color: #45c203;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Ubuntu', 'Segoe UI', sans-serif;
+}
+
+.menu-item .bi-chevron-down {
+    font-size: 0.9em;
+    transition: transform 0.2s;
+    transform: rotate(-90deg);
+}
+.menu-item[aria-expanded="true"] .bi-chevron-down {
+    transform: rotate(0deg);
+}
+
+.card .parser-label { width: 100px; }
+.card .parser-input { padding: 6px 0; }
+.panel .parser-label { width: 100px; }
+.panel .parser-input { padding: 6px 0; }
+
+.file-chosen {
+    background: #fff;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 6px 8px;
+    font-size: 14px;
+    color: #222;
+    margin-left: 10px;
+    flex: 1;
+    display: inline-block;
+}
+
+#bank-bankSelect {
+    width: 482px;
+    margin-left: auto;
+}
+
+/* Full width for Unmatched Bank Report card */
+.parser-container-fullwidth {
+    max-width: 100% !important;
+    width: 100%;
+    margin-left: 0;
+}
+
+/* Horizontal layout for Unmatched Bank Report fields */
+.unmatched-bank-form-horizontal {
+    width: 100%;
+}
+.unmatched-bank-row-horizontal {
+    display: flex;
+    flex-direction: row;
+    gap: 24px;
+    width: 100%;
+    justify-content: space-between;
+}
+.unmatched-bank-field {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 0;
+    min-width: 180px;
+    max-width: 260px;
+}
+.unmatched-bank-field .parser-label {
+    width: auto;
+    margin-bottom: 4px;
+}
+.unmatched-bank-field .parser-input {
+    width: 100%;
+}

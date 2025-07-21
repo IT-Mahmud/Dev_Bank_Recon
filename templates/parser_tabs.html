@@ -1,0 +1,385 @@
+<!-- templates/parser_tabs.html -->
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Parser</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='parser.css') }}">
+    <!-- SheetJS CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+</head>
+<body>
+<div class="topbar"><span class="topbar-title">Bank Reconcile Helper</span></div>
+<div class="d-flex">
+    <nav class="custom-sidebar">
+        <!-- Parse Statements -->
+        <div class="menu-group">
+            <a class="menu-item d-flex align-items-center justify-content-between fw-bold" data-bs-toggle="collapse" href="#parseStatementsMenu" role="button" aria-expanded="true" aria-controls="parseStatementsMenu">
+                <span class="d-flex align-items-center"><i class="bi bi-bank me-2"></i> Parse Statements</span>
+                <i class="bi bi-chevron-down ms-2"></i>
+            </a>
+            <div class="collapse show" id="parseStatementsMenu">
+                <div class="submenu-list">
+                    <a class="submenu-item" href="#" onclick="showTab('finance')">Finance Parser</a>
+                    <a class="submenu-item" href="#" onclick="showTab('bank')">Bank Parser</a>
+                    <a class="submenu-item" href="#" onclick="showTab('tally')">Tally Parser</a>
+                </div>
+            </div>
+        </div>
+        <!-- Run Match -->
+        <div class="menu-group">
+            <a class="menu-item d-flex align-items-center justify-content-between fw-bold" data-bs-toggle="collapse" href="#runMatchMenu" role="button" aria-expanded="false" aria-controls="runMatchMenu">
+                <span class="d-flex align-items-center"><i class="bi bi-diagram-3 me-2"></i> Run Match</span>
+                <i class="bi bi-chevron-down ms-2"></i>
+            </a>
+            <div class="collapse" id="runMatchMenu">
+                <div class="submenu-list">
+                    <a class="submenu-item" href="#" onclick="showTab('reconcile')">Bank Fin Match</a>
+                    <a class="submenu-item" href="#" onclick="showTab('bft-reconcile')">Bank Fin Tally Match</a>
+                    <a class="submenu-item" href="#" onclick="showTab('bank-tally-reconcile')">Bank Tally Match</a>
+                </div>
+            </div>
+        </div>
+        <!-- Reports -->
+        <div class="menu-group">
+            <a class="menu-item d-flex align-items-center justify-content-between fw-bold" data-bs-toggle="collapse" href="#reportsMenu" role="button" aria-expanded="false" aria-controls="reportsMenu">
+                <span class="d-flex align-items-center"><i class="bi bi-card-checklist me-2"></i> Reports</span>
+                <i class="bi bi-chevron-down ms-2"></i>
+            </a>
+            <div class="collapse" id="reportsMenu">
+                <div class="submenu-list">
+                    <a class="submenu-item" href="#" onclick="showTab('unmatched-bank-report')">Unmatched Bank Report</a>
+                    <a class="submenu-item" href="#" onclick="showTab('unmatched-tally-report')">Unmatched Tally Report</a>
+                    <a class="submenu-item" href="#" onclick="showTab('bank-fin-matched-report')">Bank-Fin Matched Report</a>
+                    <a class="submenu-item" href="#" onclick="showTab('bank-fin-tally-matched-report')">Bank-Fin-Tally Matched Report</a>
+                    <a class="submenu-item" href="#" onclick="showTab('bank-tally-matched-report')">Bank-Tally Matched Report</a>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <div class="flex-grow-1 tab-content-vertical p-4">
+        {% for parser in parsers %}
+        <div class="tab-pane" id="pane-{{parser.id}}" {% if loop.first %}style="display:block;"{% endif %}>
+            <div class="parser-container">
+                <h2>{{ parser.title }}</h2>
+                <form id="form-{{parser.id}}" class="parser-form" enctype="multipart/form-data" autocomplete="off">
+
+                    {% if parser.id == "bank" %}
+                    <!-- Bank Name Dropdown for Bank Statement Parser tab -->
+                    <div class="parser-row" id="bank-bankRow">
+                        <button type="button" class="parser-label parser-file-btn" onclick="this.nextElementSibling.focus()">Select Bank</button>
+                        <select name="bank_name" class="parser-input" id="bank-bankSelect" required>
+                            <option value="">-- Select Bank --</option>
+                            <option value="MTB">Mutual Trust Bank</option>
+                            <option value="MDB">Midland Bank</option>
+                            <option value="PBL">Prime Bank</option>
+                        </select>
+                    </div>
+                    {% endif %}
+
+                    <div class="parser-row">
+                        <button type="button" class="parser-label parser-file-btn" onclick="this.nextElementSibling.click()">Select File</button>
+                        <input type="file" name="{{parser.file_field}}" class="parser-input file-input" style="display:none;"
+                               {% if parser.id == 'bank' %}accept=".xls,.xlsx,.csv"{% endif %} required onchange="this.nextElementSibling.innerText = this.files[0] ? this.files[0].name : 'No file chosen'">
+                        <span class="file-chosen" style="margin-left:10px; font-size:14px; color:#222;">No file chosen</span>
+                    </div>
+                    <div class="parser-row" id="{{parser.id}}-sheetRow" style="display:none;">
+                        <label class="parser-label">Select Sheet</label>
+                        <select name="sheet_name" class="parser-input sheet-select" required>
+                        </select>
+                    </div>
+                    <div class="parser-row parser-row-parse">
+                        <button type="submit" class="parser-parse-btn" id="{{parser.id}}-parseBtn" disabled>Parse</button>
+                    </div>
+                </form>
+                <div id="{{parser.id}}-msgDiv" style="color: red; margin-top:10px"></div>
+                <div id="{{parser.id}}-uploadedDiv" style="margin-top:10px;"></div>
+            </div>
+        </div>
+        {% endfor %}
+
+        <!-- Bank-Finance Reconciliation Tab -->
+        <div class="tab-pane" id="pane-reconcile" style="display:none;">
+            <div class="parser-container">
+                <h2>Bank-Finance Reconciliation</h2>
+                <form id="reconcile-form" class="parser-form" autocomplete="off">
+                    <div class="parser-row">
+                        <label class="parser-label">Bank Table</label>
+                        <select name="bank_code" class="parser-input" id="bank-code-select" required>
+                            <option value="">-- Select Bank --</option>
+                        </select>
+
+                    </div>
+                    <div class="parser-row">
+                        <label class="parser-label">Account Number</label>
+                        <select name="account_number" class="parser-input" id="account-number-select" required>
+                            <option value="">-- Select Account --</option>
+                        </select>
+                    </div>
+                    <div class="parser-row parser-row-parse">
+                        <button type="submit" class="parser-parse-btn" id="reconcile-btn">Reconcile</button>
+                    </div>
+                </form>
+                <div id="reconcile-result" style="margin-top:20px;font-family:monospace;"></div>
+            </div>
+        </div>
+
+        <!-- Bank-Fin-Tally Reconciliation Tab -->
+        <div class="tab-pane" id="pane-bft-reconcile" style="display:none;">
+            <div class="parser-container">
+                <h2>Bank-Fin-Tally Reconciliation</h2>
+                <form id="bft-reconcile-form" class="parser-form" autocomplete="off">
+                    <div class="parser-row">
+                        <label class="parser-label">Bank Code</label>
+                        <select name="bank_code" class="parser-input" id="bft-bank-code-select" required>
+                            <option value="">-- Select Bank --</option>
+                        </select>
+
+                    </div>
+                    <div class="parser-row">
+                        <label class="parser-label">Account Number</label>
+                        <select name="account_number" class="parser-input" id="bft-account-number-select" required>
+                            <option value="">-- Select Account --</option>
+                        </select>
+                    </div>
+                    <div class="parser-row parser-row-parse">
+                        <button type="submit" class="parser-parse-btn" id="bft-reconcile-btn">Reconcile</button>
+                    </div>
+                </form>
+                <div id="bft-reconcile-result" style="margin-top:20px;font-family:monospace;"></div>
+            </div>
+        </div>
+
+        <!-- Bank-Tally Cheque Match Tab -->
+        <div class="tab-pane" id="pane-bank-tally-reconcile" style="display:none;">
+            <div class="parser-container">
+                <h2>Bank-Tally Cheque Reconciliation</h2>
+                <form id="bank-tally-reconcile-form" class="parser-form" autocomplete="off">
+                    <div class="parser-row">
+                        <label class="parser-label">Bank Code</label>
+                        <select name="bank_code" class="parser-input" id="bank-tally-bank-code-select" required>
+                            <option value="">-- Select Bank --</option>
+                        </select>
+
+                    </div>
+                    <div class="parser-row">
+                        <label class="parser-label">Account Number</label>
+                        <select name="account_number" class="parser-input" id="bank-tally-account-number-select" required>
+                            <option value="">-- Select Account --</option>
+                        </select>
+                    </div>
+                    <div class="parser-row parser-row-parse">
+                        <button type="submit" class="parser-parse-btn" id="bank-tally-reconcile-btn">Reconcile</button>
+                    </div>
+                </form>
+                <div id="bank-tally-reconcile-result" style="margin-top:20px;font-family:monospace;"></div>
+            </div>
+        </div>
+
+        <!-- Unmatched Bank Report Tab -->
+        <div class="tab-pane" id="pane-unmatched-bank-report" style="display:none;">
+            <div class="parser-container parser-container-fullwidth">
+                <h2>Unmatched Bank Report</h2>
+                <form id="unmatched-bank-form" class="parser-form unmatched-bank-form-horizontal" autocomplete="off">
+                    <div class="parser-row unmatched-bank-row-horizontal">
+                        <div class="unmatched-bank-field">
+                            <label class="parser-label">Bank Code</label>
+                            <select name="bank_code" class="parser-input" id="unmatched-bank-code-select" required>
+                                <option value="">-- Select Bank --</option>
+                            </select>
+                        </div>
+                        <div class="unmatched-bank-field">
+                            <label class="parser-label">Account Number</label>
+                            <select name="acct_no" class="parser-input" id="unmatched-acct-no-select" required>
+                                <option value="">-- Select Account --</option>
+                            </select>
+                        </div>
+                        <div class="unmatched-bank-field">
+                            <label class="parser-label">Statement Month</label>
+                            <select name="statement_month" class="parser-input" id="unmatched-statement-month-select" required>
+                                <option value="">-- Select Month --</option>
+                            </select>
+                        </div>
+                        <div class="unmatched-bank-field">
+                            <label class="parser-label">Statement Year</label>
+                            <select name="statement_year" class="parser-input" id="unmatched-statement-year-select" required>
+                                <option value="">-- Select Year --</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="parser-row parser-row-parse">
+                        <button type="submit" class="parser-parse-btn" id="unmatched-bank-btn">Generate Report</button>
+                    </div>
+                </form>
+                <div id="unmatched-bank-result" style="margin-top:20px;"></div>
+            </div>
+        </div>
+        <!-- Unmatched Tally Report Tab -->
+        <div class="tab-pane" id="pane-unmatched-tally-report" style="display:none;">
+            <div class="parser-container parser-container-fullwidth">
+                <h2>Unmatched Tally Report</h2>
+                <form id="unmatched-tally-form" class="parser-form unmatched-bank-form-horizontal" autocomplete="off">
+                    <div class="parser-row unmatched-bank-row-horizontal">
+                        <div class="unmatched-bank-field">
+                            <label class="parser-label">Bank Code</label>
+                            <select name="bank_code" class="parser-input" id="unmatched-tally-bank-code-select" required>
+                                <option value="">-- Select Bank --</option>
+                            </select>
+                        </div>
+                        <div class="unmatched-bank-field">
+                            <label class="parser-label">Account Number</label>
+                            <select name="acct_no" class="parser-input" id="unmatched-tally-acct-no-select" required>
+                                <option value="">-- Select Account --</option>
+                            </select>
+                        </div>
+                        <div class="unmatched-bank-field">
+                            <label class="parser-label">Statement Month</label>
+                            <select name="statement_month" class="parser-input" id="unmatched-tally-statement-month-select" required>
+                                <option value="">-- Select Month --</option>
+                            </select>
+                        </div>
+                        <div class="unmatched-bank-field">
+                            <label class="parser-label">Statement Year</label>
+                            <select name="statement_year" class="parser-input" id="unmatched-tally-statement-year-select" required>
+                                <option value="">-- Select Year --</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="parser-row parser-row-parse">
+                        <button type="submit" class="parser-parse-btn" id="unmatched-tally-btn">Generate Report</button>
+                    </div>
+                </form>
+                <div id="unmatched-tally-result" style="margin-top:20px;"></div>
+            </div>
+        </div>
+        <!-- Bank-Fin Matched Report Tab -->
+        <div class="tab-pane" id="pane-bank-fin-matched-report" style="display:none;">
+            <div class="parser-container parser-container-fullwidth">
+                <h2>Bank-Fin Matched Report</h2>
+                <form id="bank-fin-matched-form" class="parser-form unmatched-bank-form-horizontal" autocomplete="off">
+                    <div class="parser-row unmatched-bank-row-horizontal">
+                        <div class="unmatched-bank-field">
+                            <label class="parser-label">Bank Code</label>
+                            <select name="bank_code" class="parser-input" id="bank-fin-matched-bank-code-select" required>
+                                <option value="">-- Select Bank --</option>
+                            </select>
+                        </div>
+                        <div class="unmatched-bank-field">
+                            <label class="parser-label">Account Number</label>
+                            <select name="acct_no" class="parser-input" id="bank-fin-matched-acct-no-select" required>
+                                <option value="">-- Select Account --</option>
+                            </select>
+                        </div>
+                        <div class="unmatched-bank-field">
+                            <label class="parser-label">Statement Month</label>
+                            <select name="statement_month" class="parser-input" id="bank-fin-matched-statement-month-select" required>
+                                <option value="">-- Select Month --</option>
+                            </select>
+                        </div>
+                        <div class="unmatched-bank-field">
+                            <label class="parser-label">Statement Year</label>
+                            <select name="statement_year" class="parser-input" id="bank-fin-matched-statement-year-select" required>
+                                <option value="">-- Select Year --</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="parser-row parser-row-parse">
+                        <button type="submit" class="parser-parse-btn" id="bank-fin-matched-btn">Generate Report</button>
+                        <button type="button" class="parser-parse-btn" id="bank-fin-matched-excel-btn">Download Excel</button>
+                    </div>
+                </form>
+                <div id="bank-fin-matched-result" style="margin-top:20px;"></div>
+            </div>
+        </div>
+        <!-- Bank-Fin-Tally Matched Report Tab -->
+        <div class="tab-pane" id="pane-bank-fin-tally-matched-report" style="display:none;">
+            <div class="parser-container parser-container-fullwidth">
+                <h2>Bank-Fin-Tally Matched Report</h2>
+                <form id="bank-fin-tally-matched-form" class="parser-form unmatched-bank-form-horizontal" autocomplete="off">
+                    <div class="parser-row unmatched-bank-row-horizontal">
+                        <div class="unmatched-bank-field">
+                            <label class="parser-label">Bank Code</label>
+                            <select name="bank_code" class="parser-input" id="bank-fin-tally-matched-bank-code-select" required>
+                                <option value="">-- Select Bank --</option>
+                            </select>
+                        </div>
+                        <div class="unmatched-bank-field">
+                            <label class="parser-label">Account Number</label>
+                            <select name="acct_no" class="parser-input" id="bank-fin-tally-matched-acct-no-select" required>
+                                <option value="">-- Select Account --</option>
+                            </select>
+                        </div>
+                        <div class="unmatched-bank-field">
+                            <label class="parser-label">Statement Month</label>
+                            <select name="statement_month" class="parser-input" id="bank-fin-tally-matched-statement-month-select" required>
+                                <option value="">-- Select Month --</option>
+                            </select>
+                        </div>
+                        <div class="unmatched-bank-field">
+                            <label class="parser-label">Statement Year</label>
+                            <select name="statement_year" class="parser-input" id="bank-fin-tally-matched-statement-year-select" required>
+                                <option value="">-- Select Year --</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="parser-row parser-row-parse">
+                        <button type="submit" class="parser-parse-btn" id="bank-fin-tally-matched-btn">Generate Report</button>
+                        <button type="button" class="parser-parse-btn" id="bank-fin-tally-matched-excel-btn">Download Excel</button>
+                    </div>
+                </form>
+                <div id="bank-fin-tally-matched-result" style="margin-top:20px;"></div>
+            </div>
+        </div>
+        <!-- Bank-Tally Matched Report Tab -->
+        <div class="tab-pane" id="pane-bank-tally-matched-report" style="display:none;">
+            <div class="parser-container parser-container-fullwidth">
+                <h2>Bank-Tally Matched Report</h2>
+                <form id="bank-tally-matched-form" class="parser-form unmatched-bank-form-horizontal" autocomplete="off">
+                    <div class="parser-row unmatched-bank-row-horizontal">
+                        <div class="unmatched-bank-field">
+                            <label class="parser-label">Bank Code</label>
+                            <select name="bank_code" class="parser-input" id="bank-tally-matched-bank-code-select" required>
+                                <option value="">-- Select Bank --</option>
+                            </select>
+                        </div>
+                        <div class="unmatched-bank-field">
+                            <label class="parser-label">Account Number</label>
+                            <select name="acct_no" class="parser-input" id="bank-tally-matched-acct-no-select" required>
+                                <option value="">-- Select Account --</option>
+                            </select>
+                        </div>
+                        <div class="unmatched-bank-field">
+                            <label class="parser-label">Statement Month</label>
+                            <select name="statement_month" class="parser-input" id="bank-tally-matched-statement-month-select" required>
+                                <option value="">-- Select Month --</option>
+                            </select>
+                        </div>
+                        <div class="unmatched-bank-field">
+                            <label class="parser-label">Statement Year</label>
+                            <select name="statement_year" class="parser-input" id="bank-tally-matched-statement-year-select" required>
+                                <option value="">-- Select Year --</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="parser-row parser-row-parse">
+                        <button type="submit" class="parser-parse-btn" id="bank-tally-matched-btn">Generate Report</button>
+                        <button type="button" class="parser-parse-btn" id="bank-tally-matched-excel-btn">Download Excel</button>
+                    </div>
+                </form>
+                <div id="bank-tally-matched-result" style="margin-top:20px;"></div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<!-- Modularized JS include -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="{{ url_for('static', filename='parser_tabs.js') }}"></script>
+
+</body>
+</html>

@@ -1,0 +1,7 @@
+/utils/__pycache__
+/routes/__pycache__
+/parsers/__pycache__
+/logics/__pycache__
+__pycache__/
+/nohup.out
+venv/
