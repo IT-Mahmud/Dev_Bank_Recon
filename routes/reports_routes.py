@@ -321,6 +321,17 @@ def get_tally_statement_months():
     except Exception as e:
         return jsonify({'success': False, 'msg': str(e)}), 500
 
+@reports_bp.route('/get_fin_bank_codes', methods=['GET'])
+def get_fin_bank_codes():
+    try:
+        with engine.connect() as conn:
+            query = text("SELECT DISTINCT bank_code FROM fin_data WHERE bank_code IS NOT NULL AND bank_code != ''")
+            result = conn.execute(query)
+            codes = [row[0] for row in result]
+        return jsonify({'success': True, 'bank_codes': codes})
+    except Exception as e:
+        return jsonify({'success': False, 'msg': str(e)}), 500
+
 @reports_bp.route('/reports/bank_fin_matched', methods=['POST'])
 def get_bank_fin_matched_report():
     """
@@ -705,6 +716,105 @@ def get_finance_data_table():
                 result = conn.execute(query)
             rows = [dict(row) for row in result.mappings()]
         return jsonify({'success': True, 'data': rows, 'columns': columns})
+    except Exception as e:
+        return jsonify({'success': False, 'msg': str(e)}), 500
+
+@reports_bp.route('/get_bank_data_acct_nos', methods=['GET'])
+def get_bank_data_acct_nos():
+    try:
+        with engine.connect() as conn:
+            query = text("SELECT DISTINCT acct_no FROM bank_data WHERE acct_no IS NOT NULL AND acct_no != ''")
+            result = conn.execute(query)
+            accts = [row[0] for row in result]
+        return jsonify({'success': True, 'acct_nos': accts})
+    except Exception as e:
+        return jsonify({'success': False, 'msg': str(e)}), 500
+
+@reports_bp.route('/get_bank_data_statement_months', methods=['GET'])
+def get_bank_data_statement_months():
+    try:
+        with engine.connect() as conn:
+            query = text("SELECT DISTINCT statement_month FROM bank_data WHERE statement_month IS NOT NULL AND statement_month != ''")
+            result = conn.execute(query)
+            months = [row[0] for row in result]
+        return jsonify({'success': True, 'months': months})
+    except Exception as e:
+        return jsonify({'success': False, 'msg': str(e)}), 500
+
+@reports_bp.route('/get_bank_data_statement_years', methods=['GET'])
+def get_bank_data_statement_years():
+    try:
+        with engine.connect() as conn:
+            query = text("SELECT DISTINCT statement_year FROM bank_data WHERE statement_year IS NOT NULL AND statement_year != ''")
+            result = conn.execute(query)
+            years = [row[0] for row in result]
+        return jsonify({'success': True, 'years': years})
+    except Exception as e:
+        return jsonify({'success': False, 'msg': str(e)}), 500
+
+@reports_bp.route('/get_tally_data_acct_nos', methods=['GET'])
+def get_tally_data_acct_nos():
+    try:
+        with engine.connect() as conn:
+            query = text("SELECT DISTINCT acct_no FROM tally_data WHERE acct_no IS NOT NULL AND acct_no != ''")
+            result = conn.execute(query)
+            accts = [row[0] for row in result]
+        return jsonify({'success': True, 'acct_nos': accts})
+    except Exception as e:
+        return jsonify({'success': False, 'msg': str(e)}), 500
+
+@reports_bp.route('/get_tally_data_statement_months', methods=['GET'])
+def get_tally_data_statement_months():
+    try:
+        with engine.connect() as conn:
+            query = text("SELECT DISTINCT statement_month FROM tally_data WHERE statement_month IS NOT NULL AND statement_month != ''")
+            result = conn.execute(query)
+            months = [row[0] for row in result]
+        return jsonify({'success': True, 'months': months})
+    except Exception as e:
+        return jsonify({'success': False, 'msg': str(e)}), 500
+
+@reports_bp.route('/get_tally_data_statement_years', methods=['GET'])
+def get_tally_data_statement_years():
+    try:
+        with engine.connect() as conn:
+            query = text("SELECT DISTINCT statement_year FROM tally_data WHERE statement_year IS NOT NULL AND statement_year != ''")
+            result = conn.execute(query)
+            years = [row[0] for row in result]
+        return jsonify({'success': True, 'years': years})
+    except Exception as e:
+        return jsonify({'success': False, 'msg': str(e)}), 500
+
+@reports_bp.route('/get_fin_data_acct_nos', methods=['GET'])
+def get_fin_data_acct_nos():
+    try:
+        with engine.connect() as conn:
+            query = text("SELECT DISTINCT acct_no FROM fin_data WHERE acct_no IS NOT NULL AND acct_no != ''")
+            result = conn.execute(query)
+            accts = [row[0] for row in result]
+        return jsonify({'success': True, 'acct_nos': accts})
+    except Exception as e:
+        return jsonify({'success': False, 'msg': str(e)}), 500
+
+@reports_bp.route('/get_fin_data_statement_months', methods=['GET'])
+def get_fin_data_statement_months():
+    try:
+        with engine.connect() as conn:
+            query = text("SELECT DISTINCT statement_month FROM fin_data WHERE statement_month IS NOT NULL AND statement_month != ''")
+            result = conn.execute(query)
+            months = [row[0] for row in result]
+        return jsonify({'success': True, 'months': months})
+    except Exception as e:
+        return jsonify({'success': False, 'msg': str(e)}), 500
+
+@reports_bp.route('/get_fin_data_statement_years', methods=['GET'])
+def get_fin_data_statement_years():
+    try:
+        with engine.connect() as conn:
+            query = text("SELECT DISTINCT statement_year FROM fin_data WHERE statement_year IS NOT NULL AND statement_year != ''")
+            result = conn.execute(query)
+            years = [row[0] for row in result]
+        return jsonify({'success': True, 'years': years})
     except Exception as e:
         return jsonify({'success': False, 'msg': str(e)}), 500
 

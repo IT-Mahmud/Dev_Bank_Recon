@@ -418,11 +418,57 @@
         <div class="tab-pane" id="pane-bank-data-table" style="display:none;">
             <div class="parser-container parser-container-fullwidth">
                 <h2>Bank Data Table</h2>
-                <div class="parser-row">
-                    <label class="parser-label">Select Bank</label>
-                    <select id="bank-data-table-bank-code-select" class="parser-input">
-                        <option value="">-- Select Bank --</option>
-                    </select>
+                <div class="parser-row unmatched-bank-row-horizontal">
+                    <div class="unmatched-bank-field">
+                        <label class="parser-label">Select Bank</label>
+                        <select id="bank-data-table-bank-code-select" class="parser-input">
+                            <option value="">-- Select --</option>
+                        </select>
+                    </div>
+                    <div class="unmatched-bank-field">
+                        <label class="parser-label">Account No</label>
+                        <select id="bank-data-table-acct-no-select" class="parser-input">
+                            <option value="">-- Select --</option>
+                        </select>
+                    </div>
+                    <div class="unmatched-bank-field">
+                        <label class="parser-label">Statement Month</label>
+                        <select id="bank-data-table-statement-month-select" class="parser-input">
+                            <option value="">-- Select --</option>
+                        </select>
+                    </div>
+                    <div class="unmatched-bank-field">
+                        <label class="parser-label">Statement Year</label>
+                        <select id="bank-data-table-statement-year-select" class="parser-input">
+                            <option value="">-- Select --</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="parser-row unmatched-bank-row-horizontal">
+                    <div class="unmatched-bank-field">
+                        <label class="parser-label">BF is Matched</label>
+                        <select id="bank-data-table-bf-is-matched-select" class="parser-input">
+                            <option value="">-- All --</option>
+                            <option value="1">Yes</option>
+                            <option value="0">No</option>
+                        </select>
+                    </div>
+                    <div class="unmatched-bank-field">
+                        <label class="parser-label">BFT is Matched</label>
+                        <select id="bank-data-table-bft-is-matched-select" class="parser-input">
+                            <option value="">-- All --</option>
+                            <option value="1">Yes</option>
+                            <option value="0">No</option>
+                        </select>
+                    </div>
+                    <div class="unmatched-bank-field">
+                        <label class="parser-label">BT is Matched</label>
+                        <select id="bank-data-table-bt-is-matched-select" class="parser-input">
+                            <option value="">-- All --</option>
+                            <option value="1">Yes</option>
+                            <option value="0">No</option>
+                        </select>
+                    </div>
                 </div>
                 <div id="bank-data-table-result" style="margin-top:20px;"></div>
             </div>
@@ -430,11 +476,57 @@
         <div class="tab-pane" id="pane-tally-data-table" style="display:none;">
             <div class="parser-container parser-container-fullwidth">
                 <h2>Tally Data Table</h2>
-                <div class="parser-row">
-                    <label class="parser-label">Select Bank</label>
-                    <select id="tally-data-table-bank-code-select" class="parser-input">
-                        <option value="">-- Select Bank --</option>
-                    </select>
+                <div class="parser-row unmatched-bank-row-horizontal">
+                    <div class="unmatched-bank-field">
+                        <label class="parser-label">Select Bank</label>
+                        <select id="tally-data-table-bank-code-select" class="parser-input">
+                            <option value="">-- Select --</option>
+                        </select>
+                    </div>
+                    <div class="unmatched-bank-field">
+                        <label class="parser-label">Account No</label>
+                        <select id="tally-data-table-acct-no-select" class="parser-input">
+                            <option value="">-- Select --</option>
+                        </select>
+                    </div>
+                    <div class="unmatched-bank-field">
+                        <label class="parser-label">Statement Month</label>
+                        <select id="tally-data-table-statement-month-select" class="parser-input">
+                            <option value="">-- Select --</option>
+                        </select>
+                    </div>
+                    <div class="unmatched-bank-field">
+                        <label class="parser-label">Statement Year</label>
+                        <select id="tally-data-table-statement-year-select" class="parser-input">
+                            <option value="">-- Select --</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="parser-row unmatched-bank-row-horizontal">
+                    <div class="unmatched-bank-field">
+                        <label class="parser-label">BF is Matched</label>
+                        <select id="tally-data-table-bf-is-matched-select" class="parser-input">
+                            <option value="">-- All --</option>
+                            <option value="1">Yes</option>
+                            <option value="0">No</option>
+                        </select>
+                    </div>
+                    <div class="unmatched-bank-field">
+                        <label class="parser-label">BFT is Matched</label>
+                        <select id="tally-data-table-bft-is-matched-select" class="parser-input">
+                            <option value="">-- All --</option>
+                            <option value="1">Yes</option>
+                            <option value="0">No</option>
+                        </select>
+                    </div>
+                    <div class="unmatched-bank-field">
+                        <label class="parser-label">BT is Matched</label>
+                        <select id="tally-data-table-bt-is-matched-select" class="parser-input">
+                            <option value="">-- All --</option>
+                            <option value="1">Yes</option>
+                            <option value="0">No</option>
+                        </select>
+                    </div>
                 </div>
                 <div id="tally-data-table-result" style="margin-top:20px;"></div>
             </div>
@@ -442,11 +534,57 @@
         <div class="tab-pane" id="pane-finance-data-table" style="display:none;">
             <div class="parser-container parser-container-fullwidth">
                 <h2>Finance Data Table</h2>
-                <div class="parser-row">
-                    <label class="parser-label">Select Bank</label>
-                    <select id="finance-data-table-bank-code-select" class="parser-input">
-                        <option value="">-- Select Bank --</option>
-                    </select>
+                <div class="parser-row unmatched-bank-row-horizontal">
+                    <div class="unmatched-bank-field">
+                        <label class="parser-label">Select Bank</label>
+                        <select id="finance-data-table-bank-code-select" class="parser-input">
+                            <option value="">-- Select --</option>
+                        </select>
+                    </div>
+                    <div class="unmatched-bank-field">
+                        <label class="parser-label">Account No</label>
+                        <select id="finance-data-table-acct-no-select" class="parser-input">
+                            <option value="">-- Select --</option>
+                        </select>
+                    </div>
+                    <div class="unmatched-bank-field">
+                        <label class="parser-label">Statement Month</label>
+                        <select id="finance-data-table-statement-month-select" class="parser-input">
+                            <option value="">-- Select --</option>
+                        </select>
+                    </div>
+                    <div class="unmatched-bank-field">
+                        <label class="parser-label">Statement Year</label>
+                        <select id="finance-data-table-statement-year-select" class="parser-input">
+                            <option value="">-- Select --</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="parser-row unmatched-bank-row-horizontal">
+                    <div class="unmatched-bank-field">
+                        <label class="parser-label">BF is Matched</label>
+                        <select id="finance-data-table-bf-is-matched-select" class="parser-input">
+                            <option value="">-- All --</option>
+                            <option value="1">Yes</option>
+                            <option value="0">No</option>
+                        </select>
+                    </div>
+                    <div class="unmatched-bank-field">
+                        <label class="parser-label">BFT is Matched</label>
+                        <select id="finance-data-table-bft-is-matched-select" class="parser-input">
+                            <option value="">-- All --</option>
+                            <option value="1">Yes</option>
+                            <option value="0">No</option>
+                        </select>
+                    </div>
+                    <div class="unmatched-bank-field">
+                        <label class="parser-label">BT is Matched</label>
+                        <select id="finance-data-table-bt-is-matched-select" class="parser-input">
+                            <option value="">-- All --</option>
+                            <option value="1">Yes</option>
+                            <option value="0">No</option>
+                        </select>
+                    </div>
                 </div>
                 <div id="finance-data-table-result" style="margin-top:20px;"></div>
             </div>

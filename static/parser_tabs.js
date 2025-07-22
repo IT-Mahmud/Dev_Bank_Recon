@@ -9,33 +9,55 @@ function showTab(tabId) {
     });
     document.getElementById('pane-' + tabId).style.display = 'block';
     document.getElementById('btn-' + tabId).setAttribute('data-active','1');
-    // Auto-load Data Tables when tab is shown
+
+    // --- Helper to populate dropdowns ---
+    function populateDropdown(endpoint, selectId) {
+        fetch(endpoint, { method: 'GET' })
+            .then(resp => resp.json())
+            .then(data => {
+                const select = document.getElementById(selectId);
+                if (!select) return;
+                let key = 'bank_codes';
+                if (selectId.includes('acct-no')) key = 'acct_nos';
+                if (selectId.includes('month')) key = 'months';
+                if (selectId.includes('year')) key = 'years';
+                select.innerHTML = '<option value="">-- Select --</option>';
+                if (data.success && data[key] && data[key].length) {
+                    data[key].forEach(val => {
+                        const opt = document.createElement('option');
+                        opt.value = val;
+                        opt.text = val;
+                        select.appendChild(opt);
+                    });
+                }
+            });
+    }
+
+    // --- Bank Data Table ---
     if (tabId === 'bank-data-table') {
-        const bankSelect = document.getElementById('bank-data-table-bank-code-select');
+        // Populate all filters
+        populateDropdown('/get_bank_codes', 'bank-data-table-bank-code-select');
+        populateDropdown('/get_bank_data_acct_nos', 'bank-data-table-acct-no-select');
+        populateDropdown('/get_bank_data_statement_months', 'bank-data-table-statement-month-select');
+        populateDropdown('/get_bank_data_statement_years', 'bank-data-table-statement-year-select');
         const resultDiv = document.getElementById('bank-data-table-result');
-        // Populate bank codes if not already populated
-        if (bankSelect.options.length <= 1) {
-            fetch('/get_bank_codes', { method: 'GET' })
-                .then(resp => resp.json())
-                .then(data => {
-                    bankSelect.innerHTML = '<option value="">-- Select Bank --</option>';
-                    if (data.success && data.bank_codes.length) {
-                        data.bank_codes.forEach(code => {
-                            const opt = document.createElement('option');
-                            opt.value = code;
-                            opt.text = code;
-                            bankSelect.appendChild(opt);
-                        });
-                    }
-                });
+        function getFilters() {
+            return {
+                bank_code: document.getElementById('bank-data-table-bank-code-select').value,
+                acct_no: document.getElementById('bank-data-table-acct-no-select').value,
+                statement_month: document.getElementById('bank-data-table-statement-month-select').value,
+                statement_year: document.getElementById('bank-data-table-statement-year-select').value,
+                bf_is_matched: document.getElementById('bank-data-table-bf-is-matched-select').value,
+                bft_is_matched: document.getElementById('bank-data-table-bft-is-matched-select').value,
+                bt_is_matched: document.getElementById('bank-data-table-bt-is-matched-select').value
+            };
         }
-        // Show all or filtered data
-        function loadBankDataTable(bankCode) {
+        function loadBankDataTable() {
             resultDiv.textContent = 'Loading...';
             fetch('/data_table/bank_data', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(bankCode ? { bank_code: bankCode } : {})
+                body: JSON.stringify(getFilters())
             })
             .then(resp => resp.json())
             .then(data => {
@@ -62,37 +84,46 @@ function showTab(tabId) {
                 resultDiv.textContent = 'Error fetching data.';
             });
         }
-        // Initial load (all data)
+        // Initial load
         loadBankDataTable();
-        // On bank select
-        bankSelect.onchange = function() {
-            loadBankDataTable(bankSelect.value);
-        };
+        // Add event listeners to all filters
+        [
+            'bank-data-table-bank-code-select',
+            'bank-data-table-acct-no-select',
+            'bank-data-table-statement-month-select',
+            'bank-data-table-statement-year-select',
+            'bank-data-table-bf-is-matched-select',
+            'bank-data-table-bft-is-matched-select',
+            'bank-data-table-bt-is-matched-select'
+        ].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.onchange = loadBankDataTable;
+        });
     }
+    // --- Tally Data Table ---
     if (tabId === 'tally-data-table') {
-        const bankSelect = document.getElementById('tally-data-table-bank-code-select');
+        populateDropdown('/get_tally_bank_codes', 'tally-data-table-bank-code-select');
+        populateDropdown('/get_tally_data_acct_nos', 'tally-data-table-acct-no-select');
+        populateDropdown('/get_tally_data_statement_months', 'tally-data-table-statement-month-select');
+        populateDropdown('/get_tally_data_statement_years', 'tally-data-table-statement-year-select');
         const resultDiv = document.getElementById('tally-data-table-result');
-        if (bankSelect.options.length <= 1) {
-            fetch('/get_tally_bank_codes', { method: 'GET' })
-                .then(resp => resp.json())
-                .then(data => {
-                    bankSelect.innerHTML = '<option value="">-- Select Bank --</option>';
-                    if (data.success && data.bank_codes.length) {
-                        data.bank_codes.forEach(code => {
-                            const opt = document.createElement('option');
-                            opt.value = code;
-                            opt.text = code;
-                            bankSelect.appendChild(opt);
-                        });
-                    }
-                });
+        function getFilters() {
+            return {
+                bank_code: document.getElementById('tally-data-table-bank-code-select').value,
+                acct_no: document.getElementById('tally-data-table-acct-no-select').value,
+                statement_month: document.getElementById('tally-data-table-statement-month-select').value,
+                statement_year: document.getElementById('tally-data-table-statement-year-select').value,
+                bf_is_matched: document.getElementById('tally-data-table-bf-is-matched-select').value,
+                bft_is_matched: document.getElementById('tally-data-table-bft-is-matched-select').value,
+                bt_is_matched: document.getElementById('tally-data-table-bt-is-matched-select').value
+            };
         }
-        function loadTallyDataTable(bankCode) {
+        function loadTallyDataTable() {
             resultDiv.textContent = 'Loading...';
             fetch('/data_table/tally_data', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(bankCode ? { bank_code: bankCode } : {})
+                body: JSON.stringify(getFilters())
             })
             .then(resp => resp.json())
             .then(data => {
@@ -120,34 +151,43 @@ function showTab(tabId) {
             });
         }
         loadTallyDataTable();
-        bankSelect.onchange = function() {
-            loadTallyDataTable(bankSelect.value);
-        };
+        [
+            'tally-data-table-bank-code-select',
+            'tally-data-table-acct-no-select',
+            'tally-data-table-statement-month-select',
+            'tally-data-table-statement-year-select',
+            'tally-data-table-bf-is-matched-select',
+            'tally-data-table-bft-is-matched-select',
+            'tally-data-table-bt-is-matched-select'
+        ].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.onchange = loadTallyDataTable;
+        });
     }
+    // --- Finance Data Table ---
     if (tabId === 'finance-data-table') {
-        const bankSelect = document.getElementById('finance-data-table-bank-code-select');
+        populateDropdown('/get_fin_bank_codes', 'finance-data-table-bank-code-select');
+        populateDropdown('/get_fin_data_acct_nos', 'finance-data-table-acct-no-select');
+        populateDropdown('/get_fin_data_statement_months', 'finance-data-table-statement-month-select');
+        populateDropdown('/get_fin_data_statement_years', 'finance-data-table-statement-year-select');
         const resultDiv = document.getElementById('finance-data-table-result');
-        if (bankSelect.options.length <= 1) {
-            fetch('/get_bank_codes', { method: 'GET' })
-                .then(resp => resp.json())
-                .then(data => {
-                    bankSelect.innerHTML = '<option value="">-- Select Bank --</option>';
-                    if (data.success && data.bank_codes.length) {
-                        data.bank_codes.forEach(code => {
-                            const opt = document.createElement('option');
-                            opt.value = code;
-                            opt.text = code;
-                            bankSelect.appendChild(opt);
-                        });
-                    }
-                });
+        function getFilters() {
+            return {
+                bank_code: document.getElementById('finance-data-table-bank-code-select').value,
+                acct_no: document.getElementById('finance-data-table-acct-no-select').value,
+                statement_month: document.getElementById('finance-data-table-statement-month-select').value,
+                statement_year: document.getElementById('finance-data-table-statement-year-select').value,
+                bf_is_matched: document.getElementById('finance-data-table-bf-is-matched-select').value,
+                bft_is_matched: document.getElementById('finance-data-table-bft-is-matched-select').value,
+                bt_is_matched: document.getElementById('finance-data-table-bt-is-matched-select').value
+            };
         }
-        function loadFinanceDataTable(bankCode) {
+        function loadFinanceDataTable() {
             resultDiv.textContent = 'Loading...';
             fetch('/data_table/finance_data', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(bankCode ? { bank_code: bankCode } : {})
+                body: JSON.stringify(getFilters())
             })
             .then(resp => resp.json())
             .then(data => {
@@ -175,9 +215,18 @@ function showTab(tabId) {
             });
         }
         loadFinanceDataTable();
-        bankSelect.onchange = function() {
-            loadFinanceDataTable(bankSelect.value);
-        };
+        [
+            'finance-data-table-bank-code-select',
+            'finance-data-table-acct-no-select',
+            'finance-data-table-statement-month-select',
+            'finance-data-table-statement-year-select',
+            'finance-data-table-bf-is-matched-select',
+            'finance-data-table-bft-is-matched-select',
+            'finance-data-table-bt-is-matched-select'
+        ].forEach(id => {
+            const el = document.getElementById(id);
+            if (el) el.onchange = loadFinanceDataTable;
+        });
     }
 }
 
