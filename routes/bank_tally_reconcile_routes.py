@@ -13,6 +13,7 @@ from sqlalchemy import text
 from datetime import datetime
 
 from utils.db import engine, ensure_table_exists
+from utils.help_texts import HelpTexts
 
 from logics.bank_tally_match_logic_mdb import match_cheques as match_cheques_mdb
 from logics.bank_tally_match_logic_mtb import match_cheques as match_cheques_mtb

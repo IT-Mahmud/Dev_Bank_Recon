@@ -9,6 +9,106 @@ function showTab(tabId) {
     });
     document.getElementById('pane-' + tabId).style.display = 'block';
     document.getElementById('btn-' + tabId).setAttribute('data-active','1');
+    // Auto-load Data Tables when tab is shown
+    if (tabId === 'bank-data-table') {
+        const resultDiv = document.getElementById('bank-data-table-result');
+        resultDiv.textContent = 'Loading...';
+        fetch('/data_table/bank_data', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({})
+        })
+        .then(resp => resp.json())
+        .then(data => {
+            if (data.success && data.data.length) {
+                const rows = data.data;
+                const columns = Object.keys(rows[0]);
+                let html = `<div class='report-table-wrapper'><table class="report-table"><tr>`;
+                columns.forEach(col => { html += `<th>${col}</th>`; });
+                html += '</tr>';
+                rows.forEach(row => {
+                    html += '<tr>';
+                    columns.forEach(col => { html += `<td>${row[col] === null ? '' : row[col]}</td>`; });
+                    html += '</tr>';
+                });
+                html += '</table></div>';
+                resultDiv.innerHTML = html;
+            } else if (data.success && data.data.length === 0) {
+                resultDiv.textContent = 'No records found.';
+            } else {
+                resultDiv.textContent = data.msg || 'Failed to fetch data.';
+            }
+        })
+        .catch(() => {
+            resultDiv.textContent = 'Error fetching data.';
+        });
+    }
+    if (tabId === 'tally-data-table') {
+        const resultDiv = document.getElementById('tally-data-table-result');
+        resultDiv.textContent = 'Loading...';
+        fetch('/data_table/tally_data', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({})
+        })
+        .then(resp => resp.json())
+        .then(data => {
+            if (data.success && data.data.length) {
+                const rows = data.data;
+                const columns = Object.keys(rows[0]);
+                let html = `<div class='report-table-wrapper'><table class="report-table"><tr>`;
+                columns.forEach(col => { html += `<th>${col}</th>`; });
+                html += '</tr>';
+                rows.forEach(row => {
+                    html += '<tr>';
+                    columns.forEach(col => { html += `<td>${row[col] === null ? '' : row[col]}</td>`; });
+                    html += '</tr>';
+                });
+                html += '</table></div>';
+                resultDiv.innerHTML = html;
+            } else if (data.success && data.data.length === 0) {
+                resultDiv.textContent = 'No records found.';
+            } else {
+                resultDiv.textContent = data.msg || 'Failed to fetch data.';
+            }
+        })
+        .catch(() => {
+            resultDiv.textContent = 'Error fetching data.';
+        });
+    }
+    if (tabId === 'finance-data-table') {
+        const resultDiv = document.getElementById('finance-data-table-result');
+        resultDiv.textContent = 'Loading...';
+        fetch('/data_table/finance_data', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({})
+        })
+        .then(resp => resp.json())
+        .then(data => {
+            if (data.success && data.data.length) {
+                const rows = data.data;
+                const columns = Object.keys(rows[0]);
+                let html = `<div class='report-table-wrapper'><table class="report-table"><tr>`;
+                columns.forEach(col => { html += `<th>${col}</th>`; });
+                html += '</tr>';
+                rows.forEach(row => {
+                    html += '<tr>';
+                    columns.forEach(col => { html += `<td>${row[col] === null ? '' : row[col]}</td>`; });
+                    html += '</tr>';
+                });
+                html += '</table></div>';
+                resultDiv.innerHTML = html;
+            } else if (data.success && data.data.length === 0) {
+                resultDiv.textContent = 'No records found.';
+            } else {
+                resultDiv.textContent = data.msg || 'Failed to fetch data.';
+            }
+        })
+        .catch(() => {
+            resultDiv.textContent = 'Error fetching data.';
+        });
+    }
 }
 
 function fetchAndSetBanks(selectId) {
@@ -1790,5 +1890,185 @@ if (btMatchedForm) {
         })
         .catch(() => { alert('Failed to download Excel report.'); })
         .finally(() => { excelBtn.disabled = false; excelBtn.textContent = 'Download Excel'; });
+    });
+}
+
+// --- Data Tables: Bank Data Table ---
+if (document.getElementById('bank-data-table-bank-code-select')) {
+    populateBankDropdown('bank-data-table-bank-code-select', function() {
+        const bankCode = document.getElementById('bank-data-table-bank-code-select').value;
+        populateAccountDropdown('bank-data-table-acct-no-select', bankCode);
+    });
+    document.getElementById('bank-data-table-bank-code-select').addEventListener('change', function() {
+        const bankCode = this.value;
+        populateAccountDropdown('bank-data-table-acct-no-select', bankCode);
+    });
+    // Populate months and years
+    fetch('/get_statement_months', { method: 'GET' })
+        .then(resp => resp.json())
+        .then(data => {
+            const select = document.getElementById('bank-data-table-statement-month-select');
+            select.innerHTML = '<option value="">-- Select Month --</option>';
+            if (data.success && data.months.length) {
+                data.months.forEach(month => {
+                    const opt = document.createElement('option');
+                    opt.value = month;
+                    opt.text = month;
+                    select.appendChild(opt);
+                });
+            } else {
+                select.innerHTML = '<option value="">No months found</option>';
+            }
+        });
+    fetch('/get_statement_years', { method: 'GET' })
+        .then(resp => resp.json())
+        .then(data => {
+            const select = document.getElementById('bank-data-table-statement-year-select');
+            select.innerHTML = '<option value="">-- Select Year --</option>';
+            if (data.success && data.years.length) {
+                data.years.forEach(year => {
+                    const opt = document.createElement('option');
+                    opt.value = year;
+                    opt.text = year;
+                    select.appendChild(opt);
+                });
+            } else {
+                select.innerHTML = '<option value="">No years found</option>';
+            }
+        });
+}
+// --- Data Tables: Tally Data Table ---
+if (document.getElementById('tally-data-table-bank-code-select')) {
+    populateBankDropdown('tally-data-table-bank-code-select', function() {
+        const bankCode = document.getElementById('tally-data-table-bank-code-select').value;
+        populateAccountDropdown('tally-data-table-acct-no-select', bankCode);
+    });
+    document.getElementById('tally-data-table-bank-code-select').addEventListener('change', function() {
+        const bankCode = this.value;
+        populateAccountDropdown('tally-data-table-acct-no-select', bankCode);
+    });
+    // Populate months and years
+    fetch('/get_tally_statement_months', { method: 'GET' })
+        .then(resp => resp.json())
+        .then(data => {
+            const select = document.getElementById('tally-data-table-statement-month-select');
+            select.innerHTML = '<option value="">-- Select Month --</option>';
+            if (data.success && data.months.length) {
+                data.months.forEach(month => {
+                    const opt = document.createElement('option');
+                    opt.value = month;
+                    opt.text = month;
+                    select.appendChild(opt);
+                });
+            } else {
+                select.innerHTML = '<option value="">No months found</option>';
+            }
+        });
+    fetch('/get_tally_statement_years', { method: 'GET' })
+        .then(resp => resp.json())
+        .then(data => {
+            const select = document.getElementById('tally-data-table-statement-year-select');
+            select.innerHTML = '<option value="">-- Select Year --</option>';
+            if (data.success && data.years.length) {
+                data.years.forEach(year => {
+                    const opt = document.createElement('option');
+                    opt.value = year;
+                    opt.text = year;
+                    select.appendChild(opt);
+                });
+            } else {
+                select.innerHTML = '<option value="">No years found</option>';
+            }
+        });
+}
+// --- Data Tables: Finance Data Table ---
+if (document.getElementById('finance-data-table-bank-code-select')) {
+    populateBankDropdown('finance-data-table-bank-code-select', function() {
+        const bankCode = document.getElementById('finance-data-table-bank-code-select').value;
+        populateAccountDropdown('finance-data-table-acct-no-select', bankCode);
+    });
+    document.getElementById('finance-data-table-bank-code-select').addEventListener('change', function() {
+        const bankCode = this.value;
+        populateAccountDropdown('finance-data-table-acct-no-select', bankCode);
+    });
+    // Populate months and years
+    fetch('/get_statement_months', { method: 'GET' })
+        .then(resp => resp.json())
+        .then(data => {
+            const select = document.getElementById('finance-data-table-statement-month-select');
+            select.innerHTML = '<option value="">-- Select Month --</option>';
+            if (data.success && data.months.length) {
+                data.months.forEach(month => {
+                    const opt = document.createElement('option');
+                    opt.value = month;
+                    opt.text = month;
+                    select.appendChild(opt);
+                });
+            } else {
+                select.innerHTML = '<option value="">No months found</option>';
+            }
+        });
+    fetch('/get_statement_years', { method: 'GET' })
+        .then(resp => resp.json())
+        .then(data => {
+            const select = document.getElementById('finance-data-table-statement-year-select');
+            select.innerHTML = '<option value="">-- Select Year --</option>';
+            if (data.success && data.years.length) {
+                data.years.forEach(year => {
+                    const opt = document.createElement('option');
+                    opt.value = year;
+                    opt.text = year;
+                    select.appendChild(opt);
+                });
+            } else {
+                select.innerHTML = '<option value="">No years found</option>';
+            }
+        });
+}
+
+// --- Data Tables: Bank Data Table Form Submission ---
+const bankDataTableForm = document.getElementById('bank-data-table-form');
+if (bankDataTableForm) {
+    bankDataTableForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const btn = document.getElementById('bank-data-table-btn');
+        btn.disabled = true;
+        btn.textContent = 'Loading...';
+        const resultDiv = document.getElementById('bank-data-table-result');
+        resultDiv.textContent = 'Loading...';
+        fetch('/data_table/bank_data', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({})
+        })
+        .then(resp => resp.json())
+        .then(data => {
+            if (data.success && data.data.length) {
+                // Render table
+                const rows = data.data;
+                const columns = Object.keys(rows[0]);
+                let html = `<div class='report-table-wrapper'><table class="report-table"><tr>`;
+                columns.forEach(col => { html += `<th>${col}</th>`; });
+                html += '</tr>';
+                rows.forEach(row => {
+                    html += '<tr>';
+                    columns.forEach(col => { html += `<td>${row[col] === null ? '' : row[col]}</td>`; });
+                    html += '</tr>';
+                });
+                html += '</table></div>';
+                resultDiv.innerHTML = html;
+            } else if (data.success && data.data.length === 0) {
+                resultDiv.textContent = 'No records found.';
+            } else {
+                resultDiv.textContent = data.msg || 'Failed to fetch data.';
+            }
+        })
+        .catch(() => {
+            resultDiv.textContent = 'Error fetching data.';
+        })
+        .finally(() => {
+            btn.disabled = false;
+            btn.textContent = 'Show Table';
+        });
     });
 }

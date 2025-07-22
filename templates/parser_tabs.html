@@ -60,6 +60,46 @@
                 </div>
             </div>
         </div>
+        <!-- Data Tables -->
+        <div class="menu-group">
+            <a class="menu-item d-flex align-items-center justify-content-between fw-bold" data-bs-toggle="collapse" href="#dataTablesMenu" role="button" aria-expanded="false" aria-controls="dataTablesMenu">
+                <span class="d-flex align-items-center"><i class="bi bi-table me-2"></i> Data Tables</span>
+                <i class="bi bi-chevron-down ms-2"></i>
+            </a>
+            <div class="collapse" id="dataTablesMenu">
+                <div class="submenu-list">
+                    <a class="submenu-item" id="btn-bank-data-table" href="#" onclick="showTab('bank-data-table')">Bank Data</a>
+                    <a class="submenu-item" id="btn-tally-data-table" href="#" onclick="showTab('tally-data-table')">Tally Data</a>
+                    <a class="submenu-item" id="btn-finance-data-table" href="#" onclick="showTab('finance-data-table')">Finance Data</a>
+                </div>
+            </div>
+        </div>
+        <!-- Help (Standalone) -->
+        <div class="menu-group">
+            <a class="menu-item d-flex align-items-center justify-content-between fw-bold" data-bs-toggle="collapse" href="#helpMenu" role="button" aria-expanded="false" aria-controls="helpMenu">
+                <span class="d-flex align-items-center"><i class="bi bi-question-circle me-2"></i> Help</span>
+                <i class="bi bi-chevron-down ms-2"></i>
+            </a>
+            <div class="collapse" id="helpMenu">
+                <div class="submenu-list">
+                    <a class="submenu-item" href="#" onclick="showHelp('BANK')">Bank</a>
+                    <a class="submenu-item" href="#" onclick="showHelp('TALLY')">Tally</a>
+                    <a class="submenu-item" href="#" onclick="showHelp('FIN')">Finance</a>
+                </div>
+            </div>
+        </div>
+        <!-- Help Modal -->
+        <div class="modal fade" id="helpModal" tabindex="-1" aria-labelledby="helpModalLabel" aria-hidden="true">
+          <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="helpModalLabel">Help</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body" id="helpModalBody" style="white-space: pre-wrap;"></div>
+            </div>
+          </div>
+        </div>
     </nav>
     <div class="flex-grow-1 tab-content-vertical p-4">
         {% for parser in parsers %}
@@ -124,7 +164,7 @@
                         <button type="submit" class="parser-parse-btn" id="reconcile-btn">Reconcile</button>
                     </div>
                 </form>
-                <div id="reconcile-result" style="margin-top:20px;font-family:monospace;"></div>
+                <div id="reconcile-result" style="margin-top:20px;"></div>
             </div>
         </div>
 
@@ -150,7 +190,7 @@
                         <button type="submit" class="parser-parse-btn" id="bft-reconcile-btn">Reconcile</button>
                     </div>
                 </form>
-                <div id="bft-reconcile-result" style="margin-top:20px;font-family:monospace;"></div>
+                <div id="bft-reconcile-result" style="margin-top:20px;"></div>
             </div>
         </div>
 
@@ -176,7 +216,7 @@
                         <button type="submit" class="parser-parse-btn" id="bank-tally-reconcile-btn">Reconcile</button>
                     </div>
                 </form>
-                <div id="bank-tally-reconcile-result" style="margin-top:20px;font-family:monospace;"></div>
+                <div id="bank-tally-reconcile-result" style="margin-top:20px;"></div>
             </div>
         </div>
 
@@ -374,12 +414,48 @@
             </div>
         </div>
 
+        <!-- Data Tables Tab Panes -->
+        <div class="tab-pane" id="pane-bank-data-table" style="display:none;">
+            <div class="parser-container parser-container-fullwidth">
+                <h2>Bank Data Table</h2>
+                <div id="bank-data-table-result" style="margin-top:20px;"></div>
+            </div>
+        </div>
+        <div class="tab-pane" id="pane-tally-data-table" style="display:none;">
+            <div class="parser-container parser-container-fullwidth">
+                <h2>Tally Data Table</h2>
+                <div id="tally-data-table-result" style="margin-top:20px;"></div>
+            </div>
+        </div>
+        <div class="tab-pane" id="pane-finance-data-table" style="display:none;">
+            <div class="parser-container parser-container-fullwidth">
+                <h2>Finance Data Table</h2>
+                <div id="finance-data-table-result" style="margin-top:20px;"></div>
+            </div>
+        </div>
+
     </div>
 </div>
 
 <!-- Modularized JS include -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 <script src="{{ url_for('static', filename='parser_tabs.js') }}"></script>
+<script>
+function showHelp(key) {
+    fetch('/help/' + key)
+        .then(response => response.json())
+        .then(data => {
+            let title = key.charAt(0) + key.slice(1).toLowerCase();
+            if (key === 'BANK') title = 'Bank Parsers';
+            if (key === 'TALLY') title = 'Tally Parser';
+            if (key === 'FIN') title = 'Finance Paid List Parser';
+            document.getElementById('helpModalLabel').innerText = title + ' Help';
+            document.getElementById('helpModalBody').innerText = data.help_text;
+            var helpModal = new bootstrap.Modal(document.getElementById('helpModal'));
+            helpModal.show();
+        });
+}
+</script>
 
 </body>
 </html>

@@ -4,6 +4,7 @@ from parsers.fin_parser import parse_fin_statement
 from parsers.mdb_parser import parse_mdb_statement
 from parsers.mtb_parser import parse_mtb_statement
 from parsers.tally_parser import parse_tally_file
+from utils.help_texts import HelpTexts
 
 PARSERS = [
     {

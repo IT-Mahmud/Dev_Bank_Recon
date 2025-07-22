@@ -6,6 +6,7 @@ from sqlalchemy import text
 import pandas as pd
 import io
 import datetime
+from utils.help_texts import HelpTexts
 
 reports_bp = Blueprint('reports', __name__)
 
@@ -630,3 +631,62 @@ def download_bank_tally_matched_excel():
         )
     except Exception as e:
         return jsonify({'success': False, 'msg': str(e)}), 500
+
+@reports_bp.route('/data_table/bank_data', methods=['POST'])
+def get_bank_data_table():
+    data = request.get_json()
+    bank_code = data.get('bank_code')
+    acct_no = data.get('acct_no')
+    statement_month = data.get('statement_month')
+    statement_year = data.get('statement_year')
+
+    try:
+        with engine.connect() as conn:
+            if not any([bank_code, acct_no, statement_month, statement_year]):
+                # No filters: return all rows
+                query = text("SELECT * FROM bank_data")
+                result = conn.execute(query)
+                rows = [dict(row) for row in result.mappings()]
+            else:
+                # Filtered query as before
+                query = text(
+                    "SELECT * FROM bank_data "
+                    "WHERE bank_code = :bank_code AND acct_no = :acct_no "
+                    "AND statement_month = :statement_month AND statement_year = :statement_year"
+                )
+                result = conn.execute(query, {
+                    "bank_code": bank_code,
+                    "acct_no": acct_no,
+                    "statement_month": statement_month,
+                    "statement_year": statement_year
+                })
+                rows = [dict(row) for row in result.mappings()]
+        return jsonify({'success': True, 'data': rows})
+    except Exception as e:
+        return jsonify({'success': False, 'msg': str(e)}), 500
+
+@reports_bp.route('/data_table/tally_data', methods=['POST'])
+def get_tally_data_table():
+    try:
+        with engine.connect() as conn:
+            query = text("SELECT * FROM tally_data")
+            result = conn.execute(query)
+            rows = [dict(row) for row in result.mappings()]
+        return jsonify({'success': True, 'data': rows})
+    except Exception as e:
+        return jsonify({'success': False, 'msg': str(e)}), 500
+
+@reports_bp.route('/data_table/finance_data', methods=['POST'])
+def get_finance_data_table():
+    try:
+        with engine.connect() as conn:
+            query = text("SELECT * FROM fin_data")
+            result = conn.execute(query)
+            rows = [dict(row) for row in result.mappings()]
+        return jsonify({'success': True, 'data': rows})
+    except Exception as e:
+        return jsonify({'success': False, 'msg': str(e)}), 500
+
+@reports_bp.route('/help/<key>', methods=['GET'])
+def get_help_text(key):
+    return {'help_text': HelpTexts.get(key)}

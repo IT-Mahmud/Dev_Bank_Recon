@@ -2,6 +2,7 @@
 
 from flask import Blueprint, render_template
 from routes.parsers_config import PARSERS
+from utils.help_texts import HelpTexts
 
 main_bp = Blueprint('main', __name__)
 

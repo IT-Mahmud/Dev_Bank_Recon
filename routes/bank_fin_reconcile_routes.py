@@ -7,6 +7,7 @@ from datetime import datetime
 
 from utils.db import engine, ensure_table_exists
 from logics.bank_fin_match_logic import bank_fin_match, flatten_bf_matches
+from utils.help_texts import HelpTexts
 
 bank_fin_reconcile_bp = Blueprint('bank_fin_reconcile', __name__)
 
