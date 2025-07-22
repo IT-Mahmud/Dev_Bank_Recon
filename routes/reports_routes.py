@@ -647,6 +647,11 @@ def get_bank_data_table():
                 query = text("SELECT * FROM bank_data")
                 result = conn.execute(query)
                 rows = [dict(row) for row in result.mappings()]
+            elif bank_code and not any([acct_no, statement_month, statement_year]):
+                # Only bank_code: filter by bank_code only
+                query = text("SELECT * FROM bank_data WHERE bank_code = :bank_code")
+                result = conn.execute(query, {"bank_code": bank_code})
+                rows = [dict(row) for row in result.mappings()]
             else:
                 # Filtered query as before
                 query = text(
@@ -667,10 +672,16 @@ def get_bank_data_table():
 
 @reports_bp.route('/data_table/tally_data', methods=['POST'])
 def get_tally_data_table():
+    data = request.get_json()
+    bank_code = data.get('bank_code')
     try:
         with engine.connect() as conn:
-            query = text("SELECT * FROM tally_data")
-            result = conn.execute(query)
+            if bank_code:
+                query = text("SELECT * FROM tally_data WHERE bank_code = :bank_code")
+                result = conn.execute(query, {"bank_code": bank_code})
+            else:
+                query = text("SELECT * FROM tally_data")
+                result = conn.execute(query)
             rows = [dict(row) for row in result.mappings()]
         return jsonify({'success': True, 'data': rows})
     except Exception as e:
@@ -678,10 +689,16 @@ def get_tally_data_table():
 
 @reports_bp.route('/data_table/finance_data', methods=['POST'])
 def get_finance_data_table():
+    data = request.get_json()
+    bank_code = data.get('bank_code')
     try:
         with engine.connect() as conn:
-            query = text("SELECT * FROM fin_data")
-            result = conn.execute(query)
+            if bank_code:
+                query = text("SELECT * FROM fin_data WHERE bank_code = :bank_code")
+                result = conn.execute(query, {"bank_code": bank_code})
+            else:
+                query = text("SELECT * FROM fin_data")
+                result = conn.execute(query)
             rows = [dict(row) for row in result.mappings()]
         return jsonify({'success': True, 'data': rows})
     except Exception as e:

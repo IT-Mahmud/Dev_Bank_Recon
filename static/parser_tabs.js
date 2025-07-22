@@ -11,103 +11,173 @@ function showTab(tabId) {
     document.getElementById('btn-' + tabId).setAttribute('data-active','1');
     // Auto-load Data Tables when tab is shown
     if (tabId === 'bank-data-table') {
+        const bankSelect = document.getElementById('bank-data-table-bank-code-select');
         const resultDiv = document.getElementById('bank-data-table-result');
-        resultDiv.textContent = 'Loading...';
-        fetch('/data_table/bank_data', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({})
-        })
-        .then(resp => resp.json())
-        .then(data => {
-            if (data.success && data.data.length) {
-                const rows = data.data;
-                const columns = Object.keys(rows[0]);
-                let html = `<div class='report-table-wrapper'><table class="report-table"><tr>`;
-                columns.forEach(col => { html += `<th>${col}</th>`; });
-                html += '</tr>';
-                rows.forEach(row => {
-                    html += '<tr>';
-                    columns.forEach(col => { html += `<td>${row[col] === null ? '' : row[col]}</td>`; });
-                    html += '</tr>';
+        // Populate bank codes if not already populated
+        if (bankSelect.options.length <= 1) {
+            fetch('/get_bank_codes', { method: 'GET' })
+                .then(resp => resp.json())
+                .then(data => {
+                    bankSelect.innerHTML = '<option value="">-- Select Bank --</option>';
+                    if (data.success && data.bank_codes.length) {
+                        data.bank_codes.forEach(code => {
+                            const opt = document.createElement('option');
+                            opt.value = code;
+                            opt.text = code;
+                            bankSelect.appendChild(opt);
+                        });
+                    }
                 });
-                html += '</table></div>';
-                resultDiv.innerHTML = html;
-            } else if (data.success && data.data.length === 0) {
-                resultDiv.textContent = 'No records found.';
-            } else {
-                resultDiv.textContent = data.msg || 'Failed to fetch data.';
-            }
-        })
-        .catch(() => {
-            resultDiv.textContent = 'Error fetching data.';
-        });
+        }
+        // Show all or filtered data
+        function loadBankDataTable(bankCode) {
+            resultDiv.textContent = 'Loading...';
+            fetch('/data_table/bank_data', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(bankCode ? { bank_code: bankCode } : {})
+            })
+            .then(resp => resp.json())
+            .then(data => {
+                if (data.success && data.data.length) {
+                    const rows = data.data;
+                    const columns = Object.keys(rows[0]);
+                    let html = `<div class='report-table-wrapper'><table class="report-table"><tr>`;
+                    columns.forEach(col => { html += `<th>${col}</th>`; });
+                    html += '</tr>';
+                    rows.forEach(row => {
+                        html += '<tr>';
+                        columns.forEach(col => { html += `<td>${row[col] === null ? '' : row[col]}</td>`; });
+                        html += '</tr>';
+                    });
+                    html += '</table></div>';
+                    resultDiv.innerHTML = html;
+                } else if (data.success && data.data.length === 0) {
+                    resultDiv.textContent = 'No records found.';
+                } else {
+                    resultDiv.textContent = data.msg || 'Failed to fetch data.';
+                }
+            })
+            .catch(() => {
+                resultDiv.textContent = 'Error fetching data.';
+            });
+        }
+        // Initial load (all data)
+        loadBankDataTable();
+        // On bank select
+        bankSelect.onchange = function() {
+            loadBankDataTable(bankSelect.value);
+        };
     }
     if (tabId === 'tally-data-table') {
+        const bankSelect = document.getElementById('tally-data-table-bank-code-select');
         const resultDiv = document.getElementById('tally-data-table-result');
-        resultDiv.textContent = 'Loading...';
-        fetch('/data_table/tally_data', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({})
-        })
-        .then(resp => resp.json())
-        .then(data => {
-            if (data.success && data.data.length) {
-                const rows = data.data;
-                const columns = Object.keys(rows[0]);
-                let html = `<div class='report-table-wrapper'><table class="report-table"><tr>`;
-                columns.forEach(col => { html += `<th>${col}</th>`; });
-                html += '</tr>';
-                rows.forEach(row => {
-                    html += '<tr>';
-                    columns.forEach(col => { html += `<td>${row[col] === null ? '' : row[col]}</td>`; });
-                    html += '</tr>';
+        if (bankSelect.options.length <= 1) {
+            fetch('/get_tally_bank_codes', { method: 'GET' })
+                .then(resp => resp.json())
+                .then(data => {
+                    bankSelect.innerHTML = '<option value="">-- Select Bank --</option>';
+                    if (data.success && data.bank_codes.length) {
+                        data.bank_codes.forEach(code => {
+                            const opt = document.createElement('option');
+                            opt.value = code;
+                            opt.text = code;
+                            bankSelect.appendChild(opt);
+                        });
+                    }
                 });
-                html += '</table></div>';
-                resultDiv.innerHTML = html;
-            } else if (data.success && data.data.length === 0) {
-                resultDiv.textContent = 'No records found.';
-            } else {
-                resultDiv.textContent = data.msg || 'Failed to fetch data.';
-            }
-        })
-        .catch(() => {
-            resultDiv.textContent = 'Error fetching data.';
-        });
+        }
+        function loadTallyDataTable(bankCode) {
+            resultDiv.textContent = 'Loading...';
+            fetch('/data_table/tally_data', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(bankCode ? { bank_code: bankCode } : {})
+            })
+            .then(resp => resp.json())
+            .then(data => {
+                if (data.success && data.data.length) {
+                    const rows = data.data;
+                    const columns = Object.keys(rows[0]);
+                    let html = `<div class='report-table-wrapper'><table class="report-table"><tr>`;
+                    columns.forEach(col => { html += `<th>${col}</th>`; });
+                    html += '</tr>';
+                    rows.forEach(row => {
+                        html += '<tr>';
+                        columns.forEach(col => { html += `<td>${row[col] === null ? '' : row[col]}</td>`; });
+                        html += '</tr>';
+                    });
+                    html += '</table></div>';
+                    resultDiv.innerHTML = html;
+                } else if (data.success && data.data.length === 0) {
+                    resultDiv.textContent = 'No records found.';
+                } else {
+                    resultDiv.textContent = data.msg || 'Failed to fetch data.';
+                }
+            })
+            .catch(() => {
+                resultDiv.textContent = 'Error fetching data.';
+            });
+        }
+        loadTallyDataTable();
+        bankSelect.onchange = function() {
+            loadTallyDataTable(bankSelect.value);
+        };
     }
     if (tabId === 'finance-data-table') {
+        const bankSelect = document.getElementById('finance-data-table-bank-code-select');
         const resultDiv = document.getElementById('finance-data-table-result');
-        resultDiv.textContent = 'Loading...';
-        fetch('/data_table/finance_data', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({})
-        })
-        .then(resp => resp.json())
-        .then(data => {
-            if (data.success && data.data.length) {
-                const rows = data.data;
-                const columns = Object.keys(rows[0]);
-                let html = `<div class='report-table-wrapper'><table class="report-table"><tr>`;
-                columns.forEach(col => { html += `<th>${col}</th>`; });
-                html += '</tr>';
-                rows.forEach(row => {
-                    html += '<tr>';
-                    columns.forEach(col => { html += `<td>${row[col] === null ? '' : row[col]}</td>`; });
-                    html += '</tr>';
+        if (bankSelect.options.length <= 1) {
+            fetch('/get_bank_codes', { method: 'GET' })
+                .then(resp => resp.json())
+                .then(data => {
+                    bankSelect.innerHTML = '<option value="">-- Select Bank --</option>';
+                    if (data.success && data.bank_codes.length) {
+                        data.bank_codes.forEach(code => {
+                            const opt = document.createElement('option');
+                            opt.value = code;
+                            opt.text = code;
+                            bankSelect.appendChild(opt);
+                        });
+                    }
                 });
-                html += '</table></div>';
-                resultDiv.innerHTML = html;
-            } else if (data.success && data.data.length === 0) {
-                resultDiv.textContent = 'No records found.';
-            } else {
-                resultDiv.textContent = data.msg || 'Failed to fetch data.';
-            }
-        })
-        .catch(() => {
-            resultDiv.textContent = 'Error fetching data.';
-        });
+        }
+        function loadFinanceDataTable(bankCode) {
+            resultDiv.textContent = 'Loading...';
+            fetch('/data_table/finance_data', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(bankCode ? { bank_code: bankCode } : {})
+            })
+            .then(resp => resp.json())
+            .then(data => {
+                if (data.success && data.data.length) {
+                    const rows = data.data;
+                    const columns = Object.keys(rows[0]);
+                    let html = `<div class='report-table-wrapper'><table class="report-table"><tr>`;
+                    columns.forEach(col => { html += `<th>${col}</th>`; });
+                    html += '</tr>';
+                    rows.forEach(row => {
+                        html += '<tr>';
+                        columns.forEach(col => { html += `<td>${row[col] === null ? '' : row[col]}</td>`; });
+                        html += '</tr>';
+                    });
+                    html += '</table></div>';
+                    resultDiv.innerHTML = html;
+                } else if (data.success && data.data.length === 0) {
+                    resultDiv.textContent = 'No records found.';
+                } else {
+                    resultDiv.textContent = data.msg || 'Failed to fetch data.';
+                }
+            })
+            .catch(() => {
+                resultDiv.textContent = 'Error fetching data.';
+            });
+        }
+        loadFinanceDataTable();
+        bankSelect.onchange = function() {
+            loadFinanceDataTable(bankSelect.value);
+        };
     }
 }
 

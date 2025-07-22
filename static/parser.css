@@ -190,7 +190,7 @@ hr {
 
 /* Sidebar base */
 .custom-sidebar {
-    background: #e31919;
+    background: #1948e3;
     min-width: 250px;
     max-width: 250px;
     min-height: 100vh;
@@ -214,7 +214,7 @@ hr {
 .menu-item.active, .menu-item[aria-expanded="true"] {
     background: #1c4643;
     color: #fff;
-    border-left: 3px solid #a03500;
+    border-left: 3px solid #c6bfbb;
 }
 .menu-item:hover, .menu-item[aria-expanded="true"] {
     background: #2d4a47;
