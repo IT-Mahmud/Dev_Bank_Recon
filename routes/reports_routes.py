@@ -7,6 +7,7 @@ import pandas as pd
 import io
 import datetime
 from utils.help_texts import HelpTexts
+from sqlalchemy import inspect
 
 reports_bp = Blueprint('reports', __name__)
 
@@ -642,18 +643,17 @@ def get_bank_data_table():
 
     try:
         with engine.connect() as conn:
+            inspector = inspect(engine)
+            columns = [col['name'] for col in inspector.get_columns('bank_data')]
             if not any([bank_code, acct_no, statement_month, statement_year]):
-                # No filters: return all rows
                 query = text("SELECT * FROM bank_data")
                 result = conn.execute(query)
                 rows = [dict(row) for row in result.mappings()]
             elif bank_code and not any([acct_no, statement_month, statement_year]):
-                # Only bank_code: filter by bank_code only
                 query = text("SELECT * FROM bank_data WHERE bank_code = :bank_code")
                 result = conn.execute(query, {"bank_code": bank_code})
                 rows = [dict(row) for row in result.mappings()]
             else:
-                # Filtered query as before
                 query = text(
                     "SELECT * FROM bank_data "
                     "WHERE bank_code = :bank_code AND acct_no = :acct_no "
@@ -666,7 +666,7 @@ def get_bank_data_table():
                     "statement_year": statement_year
                 })
                 rows = [dict(row) for row in result.mappings()]
-        return jsonify({'success': True, 'data': rows})
+        return jsonify({'success': True, 'data': rows, 'columns': columns})
     except Exception as e:
         return jsonify({'success': False, 'msg': str(e)}), 500
 
@@ -676,6 +676,8 @@ def get_tally_data_table():
     bank_code = data.get('bank_code')
     try:
         with engine.connect() as conn:
+            inspector = inspect(engine)
+            columns = [col['name'] for col in inspector.get_columns('tally_data')]
             if bank_code:
                 query = text("SELECT * FROM tally_data WHERE bank_code = :bank_code")
                 result = conn.execute(query, {"bank_code": bank_code})
@@ -683,7 +685,7 @@ def get_tally_data_table():
                 query = text("SELECT * FROM tally_data")
                 result = conn.execute(query)
             rows = [dict(row) for row in result.mappings()]
-        return jsonify({'success': True, 'data': rows})
+        return jsonify({'success': True, 'data': rows, 'columns': columns})
     except Exception as e:
         return jsonify({'success': False, 'msg': str(e)}), 500
 
@@ -693,6 +695,8 @@ def get_finance_data_table():
     bank_code = data.get('bank_code')
     try:
         with engine.connect() as conn:
+            inspector = inspect(engine)
+            columns = [col['name'] for col in inspector.get_columns('fin_data')]
             if bank_code:
                 query = text("SELECT * FROM fin_data WHERE bank_code = :bank_code")
                 result = conn.execute(query, {"bank_code": bank_code})
@@ -700,7 +704,7 @@ def get_finance_data_table():
                 query = text("SELECT * FROM fin_data")
                 result = conn.execute(query)
             rows = [dict(row) for row in result.mappings()]
-        return jsonify({'success': True, 'data': rows})
+        return jsonify({'success': True, 'data': rows, 'columns': columns})
     except Exception as e:
         return jsonify({'success': False, 'msg': str(e)}), 500
 

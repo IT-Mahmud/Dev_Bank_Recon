@@ -41,7 +41,7 @@ function showTab(tabId) {
             .then(data => {
                 if (data.success && data.data.length) {
                     const rows = data.data;
-                    const columns = Object.keys(rows[0]);
+                    const columns = data.columns;
                     let html = `<div class='report-table-wrapper'><table class="report-table"><tr>`;
                     columns.forEach(col => { html += `<th>${col}</th>`; });
                     html += '</tr>';
@@ -98,7 +98,7 @@ function showTab(tabId) {
             .then(data => {
                 if (data.success && data.data.length) {
                     const rows = data.data;
-                    const columns = Object.keys(rows[0]);
+                    const columns = data.columns;
                     let html = `<div class='report-table-wrapper'><table class="report-table"><tr>`;
                     columns.forEach(col => { html += `<th>${col}</th>`; });
                     html += '</tr>';
@@ -153,7 +153,7 @@ function showTab(tabId) {
             .then(data => {
                 if (data.success && data.data.length) {
                     const rows = data.data;
-                    const columns = Object.keys(rows[0]);
+                    const columns = data.columns;
                     let html = `<div class='report-table-wrapper'><table class="report-table"><tr>`;
                     columns.forEach(col => { html += `<th>${col}</th>`; });
                     html += '</tr>';
