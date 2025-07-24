@@ -190,7 +190,7 @@ hr {
 
 /* Sidebar base */
 .custom-sidebar {
-    background: #df9db0;
+    background: #3f1156;
     min-width: 250px;
     max-width: 250px;
     min-height: 100vh;
@@ -349,8 +349,8 @@ h1, h2, h3, h4, h5, h6 {
     display: flex;
     flex-direction: column;
     flex: 1 1 0;
-    min-width: 130px;
-    max-width: 130px;
+    min-width: 180px;
+    max-width: 260px;
 }
 .unmatched-bank-field .parser-label {
     width: auto;
@@ -358,4 +358,9 @@ h1, h2, h3, h4, h5, h6 {
 }
 .unmatched-bank-field .parser-input {
     width: 100%;
+}
+
+.datatable-filter-field {
+    min-width: 115px;
+    max-width: 115px;
 }

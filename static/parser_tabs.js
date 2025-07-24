@@ -763,7 +763,7 @@ function populateBankDropdown(selectId, callback) {
         });
 }
 
-function populateAccountDropdown(selectId, bankCode) {
+function populateAccountDropdown(selectId, bankCode, endpointOverride) {
     const acctSelect = document.getElementById(selectId);
     if (!acctSelect) return;
     if (!bankCode) {
@@ -771,7 +771,8 @@ function populateAccountDropdown(selectId, bankCode) {
         return;
     }
     acctSelect.innerHTML = '<option value="">Loading...</option>';
-    fetch(`/get_acct_nos?bank_code=${encodeURIComponent(bankCode)}`, { method: 'GET' })
+    const endpoint = endpointOverride || `/get_acct_nos?bank_code=${encodeURIComponent(bankCode)}`;
+    fetch(endpoint, { method: 'GET' })
         .then(resp => resp.json())
         .then(data => {
             acctSelect.innerHTML = '<option value="">-- Select Account --</option>';
@@ -788,6 +789,64 @@ function populateAccountDropdown(selectId, bankCode) {
         })
         .catch(() => {
             acctSelect.innerHTML = '<option value="">Error</option>';
+        });
+}
+
+function populateMonthDropdown(selectId, bankCode, endpointOverride) {
+    const monthSelect = document.getElementById(selectId);
+    if (!monthSelect) return;
+    if (!bankCode) {
+        monthSelect.innerHTML = '<option value="">-- Select Month --</option>';
+        return;
+    }
+    monthSelect.innerHTML = '<option value="">Loading...</option>';
+    const endpoint = endpointOverride || `/get_statement_months?bank_code=${encodeURIComponent(bankCode)}`;
+    fetch(endpoint, { method: 'GET' })
+        .then(resp => resp.json())
+        .then(data => {
+            monthSelect.innerHTML = '<option value="">-- Select Month --</option>';
+            if (data.success && data.months.length > 0) {
+                data.months.forEach(function(month) {
+                    const opt = document.createElement('option');
+                    opt.value = month;
+                    opt.text = month;
+                    monthSelect.appendChild(opt);
+                });
+            } else {
+                monthSelect.innerHTML = '<option value="">No months found</option>';
+            }
+        })
+        .catch(() => {
+            monthSelect.innerHTML = '<option value="">Error</option>';
+        });
+}
+
+function populateYearDropdown(selectId, bankCode, endpointOverride) {
+    const yearSelect = document.getElementById(selectId);
+    if (!yearSelect) return;
+    if (!bankCode) {
+        yearSelect.innerHTML = '<option value="">-- Select Year --</option>';
+        return;
+    }
+    yearSelect.innerHTML = '<option value="">Loading...</option>';
+    const endpoint = endpointOverride || `/get_statement_years?bank_code=${encodeURIComponent(bankCode)}`;
+    fetch(endpoint, { method: 'GET' })
+        .then(resp => resp.json())
+        .then(data => {
+            yearSelect.innerHTML = '<option value="">-- Select Year --</option>';
+            if (data.success && data.years.length > 0) {
+                data.years.forEach(function(year) {
+                    const opt = document.createElement('option');
+                    opt.value = year;
+                    opt.text = year;
+                    yearSelect.appendChild(opt);
+                });
+            } else {
+                yearSelect.innerHTML = '<option value="">No years found</option>';
+            }
+        })
+        .catch(() => {
+            yearSelect.innerHTML = '<option value="">Error</option>';
         });
 }
 
@@ -2104,44 +2163,15 @@ if (document.getElementById('tally-data-table-bank-code-select')) {
 if (document.getElementById('finance-data-table-bank-code-select')) {
     populateBankDropdown('finance-data-table-bank-code-select', function() {
         const bankCode = document.getElementById('finance-data-table-bank-code-select').value;
-        populateAccountDropdown('finance-data-table-acct-no-select', bankCode);
+        populateAccountDropdown('finance-data-table-acct-no-select', bankCode, `/get_fin_data_acct_nos?bank_code=${encodeURIComponent(bankCode)}`);
+        populateMonthDropdown('finance-data-table-statement-month-select', bankCode, `/get_fin_data_statement_months?bank_code=${encodeURIComponent(bankCode)}`);
+        populateYearDropdown('finance-data-table-statement-year-select', bankCode, `/get_fin_data_statement_years?bank_code=${encodeURIComponent(bankCode)}`);
     });
     document.getElementById('finance-data-table-bank-code-select').addEventListener('change', function() {
         const bankCode = this.value;
-        populateAccountDropdown('finance-data-table-acct-no-select', bankCode);
-    });
-    // Populate months and years
-    fetch('/get_statement_months', { method: 'GET' })
-        .then(resp => resp.json())
-        .then(data => {
-            const select = document.getElementById('finance-data-table-statement-month-select');
-            select.innerHTML = '<option value="">-- Select Month --</option>';
-            if (data.success && data.months.length) {
-                data.months.forEach(month => {
-                    const opt = document.createElement('option');
-                    opt.value = month;
-                    opt.text = month;
-                    select.appendChild(opt);
-                });
-            } else {
-                select.innerHTML = '<option value="">No months found</option>';
-            }
-        });
-    fetch('/get_statement_years', { method: 'GET' })
-        .then(resp => resp.json())
-        .then(data => {
-            const select = document.getElementById('finance-data-table-statement-year-select');
-            select.innerHTML = '<option value="">-- Select Year --</option>';
-            if (data.success && data.years.length) {
-                data.years.forEach(year => {
-                    const opt = document.createElement('option');
-                    opt.value = year;
-                    opt.text = year;
-                    select.appendChild(opt);
-                });
-            } else {
-                select.innerHTML = '<option value="">No years found</option>';
-            }
+        populateAccountDropdown('finance-data-table-acct-no-select', bankCode, `/get_fin_data_acct_nos?bank_code=${encodeURIComponent(bankCode)}`);
+        populateMonthDropdown('finance-data-table-statement-month-select', bankCode, `/get_fin_data_statement_months?bank_code=${encodeURIComponent(bankCode)}`);
+        populateYearDropdown('finance-data-table-statement-year-select', bankCode, `/get_fin_data_statement_years?bank_code=${encodeURIComponent(bankCode)}`);
         });
 }
 

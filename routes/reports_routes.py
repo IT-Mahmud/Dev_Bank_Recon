@@ -644,6 +644,23 @@ def download_bank_tally_matched_excel():
     except Exception as e:
         return jsonify({'success': False, 'msg': str(e)}), 500
 
+def _format_dates_in_rows(rows, date_fields):
+    import datetime
+    for row in rows:
+        for field in date_fields:
+            if field in row and row[field]:
+                val = row[field]
+                if isinstance(val, (datetime.date, datetime.datetime)):
+                    row[field] = val.strftime('%Y-%m-%d')
+                else:
+                    # Try to parse string date
+                    try:
+                        dt = datetime.datetime.fromisoformat(str(val))
+                        row[field] = dt.strftime('%Y-%m-%d')
+                    except Exception:
+                        row[field] = str(val)[:10]
+    return rows
+
 @reports_bp.route('/data_table/bank_data', methods=['POST'])
 def get_bank_data_table():
     data = request.get_json()
@@ -651,32 +668,47 @@ def get_bank_data_table():
     acct_no = data.get('acct_no')
     statement_month = data.get('statement_month')
     statement_year = data.get('statement_year')
+    bf_is_matched = data.get('bf_is_matched')
+    bft_is_matched = data.get('bft_is_matched')
+    bt_is_matched = data.get('bt_is_matched')
 
     try:
         with engine.connect() as conn:
             inspector = inspect(engine)
             columns = [col['name'] for col in inspector.get_columns('bank_data')]
-            if not any([bank_code, acct_no, statement_month, statement_year]):
-                query = text("SELECT * FROM bank_data")
-                result = conn.execute(query)
-                rows = [dict(row) for row in result.mappings()]
-            elif bank_code and not any([acct_no, statement_month, statement_year]):
-                query = text("SELECT * FROM bank_data WHERE bank_code = :bank_code")
-                result = conn.execute(query, {"bank_code": bank_code})
-                rows = [dict(row) for row in result.mappings()]
+            filters = []
+            params = {}
+            if bank_code:
+                filters.append('bank_code = :bank_code')
+                params['bank_code'] = bank_code
+            if acct_no:
+                filters.append('acct_no = :acct_no')
+                params['acct_no'] = acct_no
+            if statement_month:
+                filters.append('statement_month = :statement_month')
+                params['statement_month'] = statement_month
+            if statement_year:
+                filters.append('statement_year = :statement_year')
+                params['statement_year'] = statement_year
+            if bf_is_matched in ('0', '1'):
+                filters.append('bf_is_matched = :bf_is_matched')
+                params['bf_is_matched'] = int(bf_is_matched)
+            if bft_is_matched in ('0', '1'):
+                filters.append('bft_is_matched = :bft_is_matched')
+                params['bft_is_matched'] = int(bft_is_matched)
+            if bt_is_matched in ('0', '1'):
+                filters.append('bt_is_matched = :bt_is_matched')
+                params['bt_is_matched'] = int(bt_is_matched)
+            if filters:
+                where_clause = ' WHERE ' + ' AND '.join(filters)
             else:
-                query = text(
-                    "SELECT * FROM bank_data "
-                    "WHERE bank_code = :bank_code AND acct_no = :acct_no "
-                    "AND statement_month = :statement_month AND statement_year = :statement_year"
-                )
-                result = conn.execute(query, {
-                    "bank_code": bank_code,
-                    "acct_no": acct_no,
-                    "statement_month": statement_month,
-                    "statement_year": statement_year
-                })
-                rows = [dict(row) for row in result.mappings()]
+                where_clause = ''
+            query = text(f"SELECT * FROM bank_data{where_clause}")
+            result = conn.execute(query, params)
+            rows = [dict(row) for row in result.mappings()]
+        # Format date fields
+        date_fields = ['B_Date', 'bf_date_matched', 'bft_date_matched', 'bt_date_matched', 'input_date']
+        rows = _format_dates_in_rows(rows, date_fields)
         return jsonify({'success': True, 'data': rows, 'columns': columns})
     except Exception as e:
         return jsonify({'success': False, 'msg': str(e)}), 500
@@ -685,17 +717,49 @@ def get_bank_data_table():
 def get_tally_data_table():
     data = request.get_json()
     bank_code = data.get('bank_code')
+    acct_no = data.get('acct_no')
+    statement_month = data.get('statement_month')
+    statement_year = data.get('statement_year')
+    bf_is_matched = data.get('bf_is_matched')
+    bft_is_matched = data.get('bft_is_matched')
+    bt_is_matched = data.get('bt_is_matched')
     try:
         with engine.connect() as conn:
             inspector = inspect(engine)
             columns = [col['name'] for col in inspector.get_columns('tally_data')]
+            filters = []
+            params = {}
             if bank_code:
-                query = text("SELECT * FROM tally_data WHERE bank_code = :bank_code")
-                result = conn.execute(query, {"bank_code": bank_code})
+                filters.append('bank_code = :bank_code')
+                params['bank_code'] = bank_code
+            if acct_no:
+                filters.append('acct_no = :acct_no')
+                params['acct_no'] = acct_no
+            if statement_month:
+                filters.append('statement_month = :statement_month')
+                params['statement_month'] = statement_month
+            if statement_year:
+                filters.append('statement_year = :statement_year')
+                params['statement_year'] = statement_year
+            if bf_is_matched in ('0', '1'):
+                filters.append('bf_is_matched = :bf_is_matched')
+                params['bf_is_matched'] = int(bf_is_matched)
+            if bft_is_matched in ('0', '1'):
+                filters.append('bft_is_matched = :bft_is_matched')
+                params['bft_is_matched'] = int(bft_is_matched)
+            if bt_is_matched in ('0', '1'):
+                filters.append('bt_is_matched = :bt_is_matched')
+                params['bt_is_matched'] = int(bt_is_matched)
+            if filters:
+                where_clause = ' WHERE ' + ' AND '.join(filters)
             else:
-                query = text("SELECT * FROM tally_data")
-                result = conn.execute(query)
+                where_clause = ''
+            query = text(f"SELECT * FROM tally_data{where_clause}")
+            result = conn.execute(query, params)
             rows = [dict(row) for row in result.mappings()]
+        # Format date fields
+        date_fields = ['T_Date', 'bf_date_matched', 'bft_date_matched', 'bt_date_matched', 'input_date']
+        rows = _format_dates_in_rows(rows, date_fields)
         return jsonify({'success': True, 'data': rows, 'columns': columns})
     except Exception as e:
         return jsonify({'success': False, 'msg': str(e)}), 500
@@ -704,17 +768,49 @@ def get_tally_data_table():
 def get_finance_data_table():
     data = request.get_json()
     bank_code = data.get('bank_code')
+    acct_no = data.get('acct_no')
+    statement_month = data.get('statement_month')
+    statement_year = data.get('statement_year')
+    bf_is_matched = data.get('bf_is_matched')
+    bft_is_matched = data.get('bft_is_matched')
+    bt_is_matched = data.get('bt_is_matched')
     try:
         with engine.connect() as conn:
             inspector = inspect(engine)
             columns = [col['name'] for col in inspector.get_columns('fin_data')]
+            filters = []
+            params = {}
             if bank_code:
-                query = text("SELECT * FROM fin_data WHERE bank_code = :bank_code")
-                result = conn.execute(query, {"bank_code": bank_code})
+                filters.append('bank_code = :bank_code')
+                params['bank_code'] = bank_code
+            if acct_no:
+                filters.append('acct_no = :acct_no')
+                params['acct_no'] = acct_no
+            if statement_month:
+                filters.append('statement_month = :statement_month')
+                params['statement_month'] = statement_month
+            if statement_year:
+                filters.append('statement_year = :statement_year')
+                params['statement_year'] = statement_year
+            if bf_is_matched in ('0', '1'):
+                filters.append('bf_is_matched = :bf_is_matched')
+                params['bf_is_matched'] = int(bf_is_matched)
+            if bft_is_matched in ('0', '1'):
+                filters.append('bft_is_matched = :bft_is_matched')
+                params['bft_is_matched'] = int(bft_is_matched)
+            if bt_is_matched in ('0', '1'):
+                filters.append('bt_is_matched = :bt_is_matched')
+                params['bt_is_matched'] = int(bt_is_matched)
+            if filters:
+                where_clause = ' WHERE ' + ' AND '.join(filters)
             else:
-                query = text("SELECT * FROM fin_data")
-                result = conn.execute(query)
+                where_clause = ''
+            query = text(f"SELECT * FROM fin_data{where_clause}")
+            result = conn.execute(query, params)
             rows = [dict(row) for row in result.mappings()]
+        # Format date fields
+        date_fields = ['F_Payment_Date', 'F_Voucher_Date', 'bf_date_matched', 'bft_date_matched', 'bt_date_matched', 'input_date']
+        rows = _format_dates_in_rows(rows, date_fields)
         return jsonify({'success': True, 'data': rows, 'columns': columns})
     except Exception as e:
         return jsonify({'success': False, 'msg': str(e)}), 500
@@ -787,10 +883,15 @@ def get_tally_data_statement_years():
 
 @reports_bp.route('/get_fin_data_acct_nos', methods=['GET'])
 def get_fin_data_acct_nos():
+    bank_code = request.args.get('bank_code')
     try:
         with engine.connect() as conn:
-            query = text("SELECT DISTINCT acct_no FROM fin_data WHERE acct_no IS NOT NULL AND acct_no != ''")
-            result = conn.execute(query)
+            if bank_code:
+                query = text("SELECT DISTINCT acct_no FROM fin_data WHERE bank_code = :bank_code AND acct_no IS NOT NULL AND acct_no != ''")
+                result = conn.execute(query, {"bank_code": bank_code})
+            else:
+                query = text("SELECT DISTINCT acct_no FROM fin_data WHERE acct_no IS NOT NULL AND acct_no != ''")
+                result = conn.execute(query)
             accts = [row[0] for row in result]
         return jsonify({'success': True, 'acct_nos': accts})
     except Exception as e:
