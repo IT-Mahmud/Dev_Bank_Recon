@@ -2221,3 +2221,58 @@ if (bankDataTableForm) {
         });
     });
 }
+
+// Add Reset Filters button logic for Bank Data Table
+if (document.getElementById('bank-data-table-reset-btn')) {
+    document.getElementById('bank-data-table-reset-btn').onclick = function() {
+        [
+            'bank-data-table-bank-code-select',
+            'bank-data-table-acct-no-select',
+            'bank-data-table-statement-month-select',
+            'bank-data-table-statement-year-select',
+            'bank-data-table-bf-is-matched-select',
+            'bank-data-table-bft-is-matched-select',
+            'bank-data-table-bt-is-matched-select'
+        ].forEach(function(id) {
+            var el = document.getElementById(id);
+            if (el) el.value = '';
+        });
+        if (typeof loadBankDataTable === 'function') loadBankDataTable();
+    };
+}
+// Add Reset Filters button logic for Tally Data Table
+if (document.getElementById('tally-data-table-reset-btn')) {
+    document.getElementById('tally-data-table-reset-btn').onclick = function() {
+        [
+            'tally-data-table-bank-code-select',
+            'tally-data-table-acct-no-select',
+            'tally-data-table-statement-month-select',
+            'tally-data-table-statement-year-select',
+            'tally-data-table-bf-is-matched-select',
+            'tally-data-table-bft-is-matched-select',
+            'tally-data-table-bt-is-matched-select'
+        ].forEach(function(id) {
+            var el = document.getElementById(id);
+            if (el) el.value = '';
+        });
+        if (typeof loadTallyDataTable === 'function') loadTallyDataTable();
+    };
+}
+// Add Reset Filters button logic for Finance Data Table
+if (document.getElementById('finance-data-table-reset-btn')) {
+    document.getElementById('finance-data-table-reset-btn').onclick = function() {
+        [
+            'finance-data-table-bank-code-select',
+            'finance-data-table-acct-no-select',
+            'finance-data-table-statement-month-select',
+            'finance-data-table-statement-year-select',
+            'finance-data-table-bf-is-matched-select',
+            'finance-data-table-bft-is-matched-select',
+            'finance-data-table-bt-is-matched-select'
+        ].forEach(function(id) {
+            var el = document.getElementById(id);
+            if (el) el.value = '';
+        });
+        if (typeof loadFinanceDataTable === 'function') loadFinanceDataTable();
+    };
+}
