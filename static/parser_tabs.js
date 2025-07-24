@@ -99,6 +99,7 @@ function showTab(tabId) {
             const el = document.getElementById(id);
             if (el) el.onchange = loadBankDataTable;
         });
+        window.loadBankDataTable = loadBankDataTable;
     }
     // --- Tally Data Table ---
     if (tabId === 'tally-data-table') {
@@ -113,7 +114,6 @@ function showTab(tabId) {
                 acct_no: document.getElementById('tally-data-table-acct-no-select').value,
                 statement_month: document.getElementById('tally-data-table-statement-month-select').value,
                 statement_year: document.getElementById('tally-data-table-statement-year-select').value,
-                bf_is_matched: document.getElementById('tally-data-table-bf-is-matched-select').value,
                 bft_is_matched: document.getElementById('tally-data-table-bft-is-matched-select').value,
                 bt_is_matched: document.getElementById('tally-data-table-bt-is-matched-select').value
             };
@@ -156,13 +156,13 @@ function showTab(tabId) {
             'tally-data-table-acct-no-select',
             'tally-data-table-statement-month-select',
             'tally-data-table-statement-year-select',
-            'tally-data-table-bf-is-matched-select',
             'tally-data-table-bft-is-matched-select',
             'tally-data-table-bt-is-matched-select'
         ].forEach(id => {
             const el = document.getElementById(id);
             if (el) el.onchange = loadTallyDataTable;
         });
+        window.loadTallyDataTable = loadTallyDataTable;
     }
     // --- Finance Data Table ---
     if (tabId === 'finance-data-table') {
@@ -227,6 +227,7 @@ function showTab(tabId) {
             const el = document.getElementById(id);
             if (el) el.onchange = loadFinanceDataTable;
         });
+        window.loadFinanceDataTable = loadFinanceDataTable;
     }
 }
 
@@ -2248,7 +2249,6 @@ if (document.getElementById('tally-data-table-reset-btn')) {
             'tally-data-table-acct-no-select',
             'tally-data-table-statement-month-select',
             'tally-data-table-statement-year-select',
-            'tally-data-table-bf-is-matched-select',
             'tally-data-table-bft-is-matched-select',
             'tally-data-table-bt-is-matched-select'
         ].forEach(function(id) {
